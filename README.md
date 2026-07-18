@@ -1,8 +1,8 @@
-<h1 align="center">Younghwan Chae</h1>
+<h1 align="center">Younghwan Chae, Ph.D. · 채영환</h1>
 
 <p align="center">
-  <b>PhD in Mechanical Engineering</b> <i>(Mathematical Optimization)</i> &nbsp;·&nbsp; ML &amp; Perception Engineer <b>@ Doosan Robotics</b><br/>
-  3D perception &amp; sensor fusion for robotics and autonomous systems — grounded in optimization, shipped to production.
+  <b>PhD in Mechanical Engineering</b> &nbsp;—&nbsp; <b><i>Mathematical Optimization</i></b> &nbsp;·&nbsp; ML &amp; Perception Engineer <b>@ Doosan Robotics</b><br/>
+  <b>Mathematical optimization is the through-line</b> — numerical optimization, surrogate modeling &amp; state estimation, carried from theory into 3D perception, sensor fusion, and production systems.
 </p>
 
 <p align="center">
