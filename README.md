@@ -84,4 +84,4 @@ flowchart LR
   <img src="https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white" alt="Docker"/>
 </p>
 
-<p align="center"><sub><i>&nbsp;·&nbsp; a long time ago: South African National Mathematics Olympiad — Top 100 nationally, 2nd in state (2010) &nbsp;·&nbsp;</i></sub></p>
+<p align="center"><sub><i>South African National Mathematics Olympiad — Top 100 nationally, 2nd in state (2010)</i></sub></p>
