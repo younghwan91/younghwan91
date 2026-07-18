@@ -27,6 +27,7 @@
 - 🤖 **ML &amp; Perception Engineer @ Doosan Robotics** (prev. bitsensing) — 3D perception, sensor fusion &amp; robotics AI across **camera · radar · LiDAR**
 - 🏭 Shipped camera/radar/LiDAR **multi-sensor perception to mass production** — 200+ deployments across 8 countries, −51% fusion error · **10 patents · 6 peer-reviewed papers**
 - 📈 On the side, I build a full open-source **quant stack** — market-data APIs, a collection pipeline, and backtesting engines
+- 🛰️ **Every sensor, every modality** — RGB/stereo/structured-light cameras, 4D imaging radar, LiDAR, IMU/GPS, point clouds &amp; RF signals, 3D scans, video, and financial time-series; few data types I haven't shipped with
 
 ### 🔭 Open-source
 
@@ -82,3 +83,5 @@ flowchart LR
   <img src="https://img.shields.io/badge/Airflow-017CEE?style=flat-square&logo=apacheairflow&logoColor=white" alt="Airflow"/>
   <img src="https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white" alt="Docker"/>
 </p>
+
+<p align="center"><sub><i>&nbsp;·&nbsp; a long time ago: South African National Mathematics Olympiad — Top 100 nationally, 2nd in state (2010) &nbsp;·&nbsp;</i></sub></p>
