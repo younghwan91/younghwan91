@@ -34,8 +34,20 @@ Market-data APIs feed a collection pipeline into TimescaleDB that the research l
 
 ```mermaid
 flowchart LR
-    A["🔌 Market-data APIs<br/>kiwoom-rest-api · krx-fundamentals-api · krx-news-rest-api"] --> B["🗄️ Pipeline<br/>kr-quant-airflow → TimescaleDB"] --> C["🧪 Research<br/>opt_portfolio · automated-stock-trading-systems"]
-    D["₿ quantbox-engine<br/>crypto futures — backtest ↔ live"]
+    subgraph APIs["🔌 Market-data APIs"]
+        direction TB
+        K[kiwoom-rest-api]
+        F[krx-fundamentals-api]
+        N[krx-news-rest-api]
+    end
+    P["🗄️ kr-quant-airflow<br/>→ TimescaleDB"]
+    subgraph RES["🧪 Research"]
+        direction TB
+        O[opt_portfolio]
+        S[automated-stock-trading-systems]
+    end
+    C["₿ quantbox-engine<br/>crypto futures · backtest ↔ live"]
+    APIs --> P --> RES
 ```
 
 | Project | What it is |
@@ -46,6 +58,8 @@ flowchart LR
 | **[krx-fundamentals-api](https://github.com/younghwan91/krx-fundamentals-api)** | Korean corporate fundamentals API (DART + KRX + Naver) |
 | **[opt_portfolio](https://github.com/younghwan91/opt_portfolio)** | VAA-based tactical asset allocation |
 | **[automated-stock-trading-systems](https://github.com/younghwan91/automated-stock-trading-systems)** | Backtester for Bensdorp's 7 non-correlated systems |
+
+🔒 **Also private** — equity screeners (Wyckoff accumulation · Minervini + VCP), a statistical-arbitrage crypto engine, and live trading systems. *Available on request.*
 
 ### 🛠️ Tech
 
