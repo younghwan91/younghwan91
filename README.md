@@ -34,20 +34,26 @@ Market-data APIs feed a collection pipeline into TimescaleDB that the research l
 
 ```mermaid
 flowchart LR
-    subgraph APIs["🔌 Market-data APIs"]
+    subgraph SRC["🔌 Market-data APIs"]
         direction TB
         K[kiwoom-rest-api]
         F[krx-fundamentals-api]
-        N[krx-news-rest-api]
+        NW[krx-news-rest-api]
     end
-    P["🗄️ kr-quant-airflow<br/>→ TimescaleDB"]
+    AF["🗄️ kr-quant-airflow"]
+    DB[("TimescaleDB")]
     subgraph RES["🧪 Research"]
         direction TB
         O[opt_portfolio]
-        S[automated-stock-trading-systems]
+        AT[automated-stock-trading-systems]
     end
-    C["₿ quantbox-engine<br/>crypto futures · backtest ↔ live"]
-    APIs --> P --> RES
+    K --> AF
+    F --> AF
+    NW --> AF
+    AF --> DB
+    DB --> O
+    DB --> AT
+    CR["₿ quantbox-engine<br/>crypto futures · backtest ↔ live"]
 ```
 
 | Project | What it is |
