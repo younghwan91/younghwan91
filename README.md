@@ -12,7 +12,7 @@
 </p>
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/younghwan91/younghwan91/main/assets/optimization.svg" width="560" alt="Gaussian-process surrogate (mean ± σ) with Bayesian optimization converging to the global optimum"/>
+  <img src="https://raw.githubusercontent.com/younghwan91/younghwan91/main/assets/bo3d.gif" width="640" alt="Bayesian optimization over a 3D GP posterior — a translucent mean ± σ envelope tightening as UCB sampling converges to the global optimum"/>
 </p>
 
 <p align="center">
