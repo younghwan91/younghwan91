@@ -12,7 +12,7 @@
 </p>
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/younghwan91/younghwan91/main/assets/bo3d.gif" width="640" alt="Bayesian optimization over a 3D GP posterior — a translucent mean ± σ envelope tightening as UCB sampling converges to the global optimum"/>
+  <img src="https://raw.githubusercontent.com/younghwan91/younghwan91/main/assets/bo3d.gif?v=3" width="760" alt="Bayesian optimization: rotating 3D GP posterior beside μ/σ/α acquisition heatmaps showing the explore–exploit trade-off that picks each next sample"/>
 </p>
 
 <p align="center">
