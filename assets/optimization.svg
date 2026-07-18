@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 220" width="720" height="220" fill="none" role="img" aria-label="Gradient descent converging to the minimum of a loss curve">
+  <defs>
+    <linearGradient id="curve" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#6366F1"/>
+      <stop offset="0.5" stop-color="#22D3EE"/>
+      <stop offset="1" stop-color="#6366F1"/>
+    </linearGradient>
+    <filter id="glow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="4" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- axes (subtle, readable on light & dark) -->
+  <g stroke="#94A3B8" stroke-opacity="0.25" stroke-width="1">
+    <line x1="60" y1="188" x2="700" y2="188"/>
+    <line x1="60" y1="18" x2="60" y2="188"/>
+  </g>
+
+  <!-- loss curve  f(x) -->
+  <path d="M80,32 Q400,248 720,32" stroke="url(#curve)" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- minimum x* : pulsing ring -->
+  <circle cx="400" cy="140" r="4.5" fill="#22D3EE"/>
+  <circle cx="400" cy="140" r="6" fill="none" stroke="#22D3EE" stroke-width="2">
+    <animate attributeName="r" values="6;17;6" dur="2.2s" repeatCount="indefinite"/>
+    <animate attributeName="stroke-opacity" values="0.9;0;0.9" dur="2.2s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- descending point : gradient descent, ease-out = convergence -->
+  <circle r="7" fill="#FBBF24" filter="url(#glow)">
+    <animateMotion dur="3s" repeatCount="indefinite" calcMode="spline"
+      keyTimes="0;0.7;1" keyPoints="0;1;1"
+      keySplines="0.2 0.7 0.2 1 ; 0 0 1 1"
+      path="M80,32 Q240,140 400,140"/>
+    <animate attributeName="opacity" values="1;1;1;0;1"
+      keyTimes="0;0.6;0.86;0.94;1" dur="3s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- labels -->
+  <text x="62" y="210" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13" fill="#94A3B8">minimize  f(x)</text>
+  <text x="400" y="118" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13" fill="#94A3B8">x*</text>
+</svg>
