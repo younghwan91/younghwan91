@@ -11,17 +11,13 @@
   <a href="https://github.com/younghwan91/resume/releases/latest/download/resume_en.pdf"><img src="https://img.shields.io/badge/Résumé-B7472A?style=for-the-badge&logo=adobeacrobatreader&logoColor=white" alt="Résumé (PDF)"/></a>
 </p>
 
-<p align="center">
-  <b>Mathematical Optimization</b> · 3D Perception &amp; Sensor Fusion · Camera · Radar · LiDAR · MLOps · Quantitative Research
-</p>
-
 ---
 
 ### 🧠 Background
 
-- 🎓 **PhD in Mechanical Engineering**, specialized in **mathematical optimization** — numerical optimization, surrogate modeling, state estimation (all degrees *Cum Laude*)
+- 🎓 **PhD in Mechanical Engineering** — all degrees *Cum Laude*
 - 🤖 **ML &amp; Perception Engineer @ Doosan Robotics** (prev. bitsensing) — 3D perception, sensor fusion &amp; robotics AI across **camera · radar · LiDAR**
-- 🏭 Shipped camera/radar/LiDAR **multi-sensor perception to mass production** — 200+ deployments across 8 countries, −51% fusion error · **10 patents · 6 peer-reviewed papers**
+- 🏭 Shipped **multi-sensor perception to mass production** — 200+ deployments across 8 countries, −51% fusion error · **10 patents · 6 peer-reviewed papers**
 - 📈 On the side, I build a full open-source **quant stack** — market-data APIs, a collection pipeline, and research &amp; backtesting engines
 - 🛰️ **Every sensor, every modality** — RGB/stereo/structured-light cameras, 4D imaging radar, LiDAR, IMU/GPS, point clouds &amp; RF signals, 3D scans, video, and financial time-series; few data types I haven't shipped with
 
@@ -83,5 +79,3 @@ flowchart LR
   <img src="https://img.shields.io/badge/Airflow-017CEE?style=flat-square&logo=apacheairflow&logoColor=white" alt="Airflow"/>
   <img src="https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white" alt="Docker"/>
 </p>
-
-<p align="center"><sub><i>South African National Mathematics Olympiad — Top 100 nationally, 2nd in state (2010)</i></sub></p>
