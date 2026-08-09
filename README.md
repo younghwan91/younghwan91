@@ -8,7 +8,6 @@
 <p align="center">
   <a href="https://www.linkedin.com/in/younghwan-chae/"><img src="https://img.shields.io/badge/LinkedIn-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn"/></a>
   <a href="mailto:chyohw97@gmail.com"><img src="https://img.shields.io/badge/Gmail-EA4335?style=for-the-badge&logo=gmail&logoColor=white" alt="Gmail"/></a>
-  <a href="https://scholar.google.com/citations?user=kDEBql4AAAAJ"><img src="https://img.shields.io/badge/Google%20Scholar-4285F4?style=for-the-badge&logo=googlescholar&logoColor=white" alt="Google Scholar"/></a>
   <a href="https://github.com/younghwan91/resume/releases/latest/download/resume_en.pdf"><img src="https://img.shields.io/badge/Résumé-B7472A?style=for-the-badge&logo=adobeacrobatreader&logoColor=white" alt="Résumé (PDF)"/></a>
 </p>
 
@@ -22,7 +21,7 @@
 
 - 🎓 **PhD in Mechanical Engineering**, specialized in **mathematical optimization** — numerical optimization, surrogate modeling, state estimation (all degrees *Cum Laude*)
 - 🤖 **ML &amp; Perception Engineer @ Doosan Robotics** (prev. bitsensing) — 3D perception, sensor fusion &amp; robotics AI across **camera · radar · LiDAR**
-- 🏭 Shipped camera/radar/LiDAR **multi-sensor perception to mass production** — 200+ deployments across 8 countries, −51% fusion error · **10 patents · [6 peer-reviewed papers](https://scholar.google.com/citations?user=kDEBql4AAAAJ)**
+- 🏭 Shipped camera/radar/LiDAR **multi-sensor perception to mass production** — 200+ deployments across 8 countries, −51% fusion error · **10 patents · 6 peer-reviewed papers**
 - 📈 On the side, I build a full open-source **quant stack** — market-data APIs, a collection pipeline, and research &amp; backtesting engines
 - 🛰️ **Every sensor, every modality** — RGB/stereo/structured-light cameras, 4D imaging radar, LiDAR, IMU/GPS, point clouds &amp; RF signals, 3D scans, video, and financial time-series; few data types I haven't shipped with
 
