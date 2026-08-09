@@ -26,29 +26,15 @@
 Market-data APIs feed a collection pipeline into TimescaleDB that the research layer reads — plus a standalone crypto engine fed straight from exchange APIs.
 
 ```mermaid
-flowchart LR
-    subgraph SRC["🔌 Market-data APIs"]
-        direction TB
-        K[kiwoom-rest-api]
-        F[krx-fundamentals-api]
-        NW[krx-news-rest-api]
-    end
-    AF["🗄️ kr-quant-airflow"]
-    DB[("TimescaleDB")]
-    subgraph RES["🧪 Research"]
-        direction TB
-        Q[kr-quant]
-        O[opt_portfolio]
-        AT[automated-stock-trading-systems]
-    end
-    K --> AF
-    F --> AF
-    NW --> AF
-    AF --> DB
-    DB --> Q
-    DB --> O
-    DB --> AT
-    EX["🔌 Exchange APIs"] --> CR["₿ quantbox-engine<br/>crypto futures · backtest ↔ live"]
+flowchart TD
+    K["🔌 kiwoom-rest-api"] --> AF
+    F["🔌 krx-fundamentals-api"] --> AF
+    NW["🔌 krx-news-rest-api"] --> AF
+    AF["🗄️ kr-quant-airflow"] --> DB[("TimescaleDB")]
+    DB --> Q["🧪 kr-quant"]
+    DB --> O["🧪 opt_portfolio"]
+    DB --> AT["🧪 automated-stock-<br/>trading-systems"]
+    EX["🔌 Exchange APIs"] --> CR["₿ quantbox-engine<br/>backtest ↔ live"]
 ```
 
 | Project | What it is |
