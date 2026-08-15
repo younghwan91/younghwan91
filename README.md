@@ -18,23 +18,36 @@
 - 🎓 **PhD in Mechanical Engineering** — all degrees *Cum Laude*
 - 🤖 **ML &amp; Perception Engineer @ Doosan Robotics** (prev. bitsensing) — 3D perception, sensor fusion &amp; robotics AI across **camera · radar · LiDAR**
 - 🏭 Shipped **multi-sensor perception to mass production** — 200+ deployments across 8 countries, −51% fusion error · **10 patents · 6 peer-reviewed papers**
-- 📈 On the side, I build a full open-source **quant stack** — market-data APIs, a collection pipeline, and research &amp; backtesting engines
+- 📈 On the side, I build a full open-source **quant stack** across **Korean equities · US equities · crypto** — market-data APIs, a collection pipeline, and research &amp; backtesting engines, with point-in-time data and survivorship-bias handling throughout
 - 🛰️ **Every sensor, every modality** — RGB/stereo/structured-light cameras, 4D imaging radar, LiDAR, IMU/GPS, point clouds &amp; RF signals, 3D scans, video, and financial time-series; few data types I haven't shipped with
 
 <h3><img src="https://img.shields.io/badge/%F0%9F%94%AD%20OPEN--SOURCE-059669?style=for-the-badge&labelColor=1E293B" height="26" alt="Open-source"/></h3>
 
-Market-data APIs feed a collection pipeline into TimescaleDB that the research layer reads — plus a standalone crypto engine fed straight from exchange APIs.
+Three independent stacks — **Korean equities** (own APIs → Airflow → TimescaleDB → research), **US equities** (point-in-time factor engine), and **crypto** (exchange APIs → backtest↔live engine).
 
 ```mermaid
 flowchart TD
-    K["🔌 kiwoom-rest-api"] --> AF
-    F["🔌 krx-fundamentals-api"] --> AF
-    NW["🔌 krx-news-rest-api"] --> AF
-    AF["🗄️ kr-quant-airflow"] --> DB[("TimescaleDB")]
-    DB --> Q["🧪 kr-quant"]
-    DB --> O["🧪 opt_portfolio"]
-    DB --> AT["🧪 automated-stock-<br/>trading-systems"]
-    EX["🔌 Exchange APIs"] --> CR["₿ quantbox-engine<br/>backtest ↔ live"]
+    subgraph KR ["🇰🇷 Korean equities"]
+        direction TB
+        K["🔌 kiwoom-rest-api"] --> AF
+        F["🔌 krx-fundamentals-api"] --> AF
+        NW["🔌 krx-news-rest-api"] --> AF
+        AF["🗄️ kr-quant-airflow"] --> DB[("TimescaleDB<br/>delisted incl.")]
+        DB --> Q["🧪 kr-quant"]
+    end
+
+    subgraph US ["🇺🇸 US equities"]
+        direction TB
+        SH["🔌 Sharadar"] --> O["🧪 opt_portfolio<br/>158 factors · 21,963 tickers"]
+        YF["🔌 yfinance / synthetic"] --> AT["🧪 automated-stock-<br/>trading-systems"]
+    end
+
+    subgraph CX ["₿ Crypto"]
+        direction TB
+        EX["🔌 Exchange APIs"] --> CR["⚙️ quantbox-engine<br/>backtest ↔ live"]
+    end
+
+    KR ~~~ US ~~~ CX
 
     classDef src    fill:#2563EB,stroke:#1E40AF,stroke-width:1px,color:#FFFFFF
     classDef pipe   fill:#7C3AED,stroke:#5B21B6,stroke-width:1px,color:#FFFFFF
@@ -42,24 +55,30 @@ flowchart TD
     classDef res    fill:#059669,stroke:#065F46,stroke-width:1px,color:#FFFFFF
     classDef crypto fill:#EA580C,stroke:#9A3412,stroke-width:1px,color:#FFFFFF
 
-    class K,F,NW,EX src
+    class K,F,NW,EX,SH,YF src
     class AF pipe
     class DB store
     class Q,O,AT res
     class CR crypto
 
-    linkStyle default stroke:#94A3B8,stroke-width:1.5px
+    style KR fill:#0F172A08,stroke:#64748B,stroke-width:1px
+    style US fill:#0F172A08,stroke:#64748B,stroke-width:1px
+    style CX fill:#0F172A08,stroke:#64748B,stroke-width:1px
+
+    %% 0-7: 실제 데이터 흐름 / 8-9: 서브그래프 세로 정렬용 (숨김)
+    linkStyle 0,1,2,3,4,5,6,7 stroke:#94A3B8,stroke-width:1.5px
+    linkStyle 8,9 stroke-width:0px,stroke:none,fill:none
 ```
 
 | Project | What it is |
 |---|---|
-| **[kiwoom-rest-api](https://github.com/younghwan91/kiwoom-rest-api)**<br/><img src="https://img.shields.io/badge/DATA%20SOURCE-2563EB?style=flat-square&labelColor=1E293B" alt="DATA SOURCE"/> | Kiwoom Securities REST API wrapper — 207 endpoints + real-time WebSocket |
+| **[kiwoom-rest-api](https://github.com/younghwan91/kiwoom-rest-api)**<br/><img src="https://img.shields.io/badge/DATA%20SOURCE-2563EB?style=flat-square&labelColor=1E293B" alt="DATA SOURCE"/> | Kiwoom Securities REST API wrapper — 186 endpoints (182 REST + 4 condition-search) &amp; 19 real-time WebSocket feeds · sync + async, auto token refresh · **`pip install kiwoom-client`** |
 | **[quantbox-engine](https://github.com/younghwan91/quantbox-engine)**<br/><img src="https://img.shields.io/badge/CRYPTO%20ENGINE-EA580C?style=flat-square&labelColor=1E293B" alt="CRYPTO ENGINE"/> | Crypto futures backtest &amp; execution engine — zero lookahead, backtest↔live parity |
-| **[kr-quant-airflow](https://github.com/younghwan91/kr-quant-airflow)**<br/><img src="https://img.shields.io/badge/PIPELINE-7C3AED?style=flat-square&labelColor=1E293B" alt="PIPELINE"/> | Airflow pipeline collecting Korean market data into TimescaleDB |
-| **[krx-fundamentals-api](https://github.com/younghwan91/krx-fundamentals-api)**<br/><img src="https://img.shields.io/badge/DATA%20SOURCE-2563EB?style=flat-square&labelColor=1E293B" alt="DATA SOURCE"/> | Korean corporate fundamentals API (DART + KRX + Naver) |
+| **[kr-quant-airflow](https://github.com/younghwan91/kr-quant-airflow)**<br/><img src="https://img.shields.io/badge/PIPELINE-7C3AED?style=flat-square&labelColor=1E293B" alt="PIPELINE"/> | Airflow pipeline collecting Korean market data (prices, supply/demand, earnings, consensus) into TimescaleDB — **delisted-stock backfill** so downstream backtests aren't survivorship-biased |
+| **[krx-fundamentals-api](https://github.com/younghwan91/krx-fundamentals-api)**<br/><img src="https://img.shields.io/badge/DATA%20SOURCE-2563EB?style=flat-square&labelColor=1E293B" alt="DATA SOURCE"/> | Korean corporate fundamentals API — financial statements, valuation metrics, dividends, major shareholders &amp; stock screening (DART + KRX + Naver) |
 | **[krx-news-rest-api](https://github.com/younghwan91/krx-news-rest-api)**<br/><img src="https://img.shields.io/badge/DATA%20SOURCE-2563EB?style=flat-square&labelColor=1E293B" alt="DATA SOURCE"/> | Korean market news &amp; disclosure collection API (FastAPI + Redis) |
-| **[kr-quant](https://github.com/younghwan91/kr-quant)**<br/><img src="https://img.shields.io/badge/RESEARCH-059669?style=flat-square&labelColor=1E293B" alt="RESEARCH"/> | KOSPI/KOSDAQ alpha research — walk-forward, trade-level distributions &amp; random null controls enforced as guardrails |
-| **[opt_portfolio](https://github.com/younghwan91/opt_portfolio)**<br/><img src="https://img.shields.io/badge/RESEARCH-059669?style=flat-square&labelColor=1E293B" alt="RESEARCH"/> | VAA-based tactical asset allocation |
+| **[kr-quant](https://github.com/younghwan91/kr-quant)**<br/><img src="https://img.shields.io/badge/RESEARCH-059669?style=flat-square&labelColor=1E293B" alt="RESEARCH"/> | KOSPI/KOSDAQ alpha research at the trade-distribution level — walk-forward, random null controls, purged CV, Deflated Sharpe &amp; survivorship-corrected universes, all **enforced as CI guardrails** |
+| **[opt_portfolio](https://github.com/younghwan91/opt_portfolio)**<br/><img src="https://img.shields.io/badge/RESEARCH-059669?style=flat-square&labelColor=1E293B" alt="RESEARCH"/> | US equity factor engine — **158 factors over 21,963 tickers (1997–2026)**, point-in-time &amp; survivorship-bias-free, walk-forward optimization gated by Deflated Sharpe · plus a VAA tactical asset allocation backtester |
 | **[automated-stock-trading-systems](https://github.com/younghwan91/automated-stock-trading-systems)**<br/><img src="https://img.shields.io/badge/RESEARCH-059669?style=flat-square&labelColor=1E293B" alt="RESEARCH"/> | Backtester for Bensdorp's 7 non-correlated systems |
 
 🔒 **Also private** — equity screeners (Wyckoff accumulation · Minervini + VCP), a statistical-arbitrage crypto engine, and live trading systems. *Available on request.*
