@@ -21,6 +21,18 @@
 - 📈 On the side, I build a full open-source **quant stack** across **Korean equities · US equities · crypto** — market-data APIs, a collection pipeline, and research &amp; backtesting engines, with point-in-time data and survivorship-bias handling throughout
 - 🛰️ **Every sensor, every modality** — RGB/stereo/structured-light cameras, 4D imaging radar, LiDAR, IMU/GPS, point clouds &amp; RF signals, 3D scans, video, and financial time-series; few data types I haven't shipped with
 
+<h3><img src="https://img.shields.io/badge/%F0%9F%93%84%20PUBLICATIONS-0891B2?style=for-the-badge&labelColor=1E293B" height="26" alt="Publications"/></h3>
+
+Selected peer-reviewed work — optimization theory first, then the same machinery applied to radar and sensor fusion.
+
+| Paper | Venue |
+|---|---|
+| [Improved Accuracy of Track-Based Integration of Radar and Vision Sensors](https://doi.org/10.1109/JSEN.2025.3557456) | IEEE Sensors Journal · 2025 |
+| [Deep-Learning-Based Kick Motion Recognition in Millimeter Waveband Radar System](https://doi.org/10.1109/JSEN.2024.3439686) | IEEE Sensors Journal · 2024 |
+| [Implementation of Deep Learning-based Kick Gesture Recognition Using 60 GHz Radar Sensor](https://doi.org/10.1109/RadarConf2458775.2024.10549343) | IEEE Radar Conference · 2024 |
+| [Gradient-only surrogate to resolve learning rates for robust and consistent training of deep neural networks](https://doi.org/10.1007/s10489-022-04206-8) | Applied Intelligence · 2023 |
+| [Heuristic linear algebraic rank-variance formulation and solution approach for efficient sensor placement](https://doi.org/10.1016/j.engstruct.2017.10.055) | Engineering Structures · 2017 |
+
 <h3><img src="https://img.shields.io/badge/%F0%9F%94%AD%20OPEN--SOURCE-059669?style=for-the-badge&labelColor=1E293B" height="26" alt="Open-source"/></h3>
 
 Three independent stacks — **Korean equities** (own APIs → Airflow → TimescaleDB → research), **US equities** (point-in-time factor engine), and **crypto** (exchange APIs → backtest↔live engine).
