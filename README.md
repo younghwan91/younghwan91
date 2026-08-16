@@ -23,52 +23,50 @@
 
 <h3><img src="https://img.shields.io/badge/%F0%9F%94%AD%20OPEN--SOURCE-059669?style=for-the-badge&labelColor=1E293B" height="26" alt="Open-source"/></h3>
 
-Three independent stacks — **Korean equities** (collection → TimescaleDB → research), **US equities** (point-in-time factor engine), and **crypto** (exchange APIs → backtest↔live engine). The two REST APIs stand on their own; they serve data directly rather than feeding the pipeline.
+Three stacks that share a shape — **collect → store → research** — but only the Korean one needs all three stages. The two REST APIs are standalone services, not pipeline inputs.
 
 ```mermaid
-flowchart TD
+flowchart TB
     subgraph KR ["🇰🇷 Korean equities"]
-        direction TB
-        K["🔌 kiwoom-rest-api"] --> AF
-        AF["🗄️ quant-airflow<br/>DART · KRX · Naver collectors"] --> DB[("TimescaleDB<br/>delisted incl.")]
-        DB --> Q["🧪 kr-quant"]
-        F["🔌 krx-fundamentals-api"]
-        NW["🔌 krx-news-rest-api"]
+        direction LR
+        K["kiwoom-rest-api"] --> AF["quant-airflow<br/>DART · KRX · Naver"] --> DB[("TimescaleDB<br/>delisted included")] --> Q["kr-quant"]
     end
 
     subgraph US ["🇺🇸 US equities"]
-        direction TB
-        SH["🔌 Sharadar"] --> O["🧪 opt_portfolio<br/>158 factors · 21,963 tickers"]
-        YF["🔌 yfinance / synthetic"] --> AT["🧪 automated-stock-<br/>trading-systems"]
+        direction LR
+        SH["Sharadar"] --> O["opt_portfolio"]
+        YF["yfinance"] --> AT["automated-stock-trading-systems"]
     end
 
-    subgraph CX ["₿ Crypto"]
-        direction TB
-        EX["🔌 Exchange APIs"] --> CR["⚙️ quantbox-engine<br/>backtest ↔ live"]
+    subgraph CX ["🪙 Crypto"]
+        direction LR
+        EX["Exchange APIs"] --> CR["quantbox-engine"]
     end
 
-    KR ~~~ US ~~~ CX
+    subgraph SVC ["Standalone REST APIs"]
+        direction TB
+        F["krx-fundamentals-api"]
+        NW["krx-news-rest-api"]
+    end
 
-    classDef src    fill:#2563EB,stroke:#1E40AF,stroke-width:1px,color:#FFFFFF
-    classDef pipe   fill:#7C3AED,stroke:#5B21B6,stroke-width:1px,color:#FFFFFF
-    classDef store  fill:#B45309,stroke:#78350F,stroke-width:1px,color:#FFFFFF
-    classDef res    fill:#059669,stroke:#065F46,stroke-width:1px,color:#FFFFFF
-    classDef crypto fill:#EA580C,stroke:#9A3412,stroke-width:1px,color:#FFFFFF
+    %% 세로 정렬용 — `~~~` 는 그 자체로 보이지 않는 링크다(linkStyle 불필요).
+    KR ~~~ US ~~~ CX ~~~ SVC
 
-    class K,F,NW,EX,SH,YF src
-    class AF pipe
-    class DB store
-    class Q,O,AT res
-    class CR crypto
+    classDef source fill:#2563EB,stroke:#1E40AF,color:#FFFFFF
+    classDef move   fill:#B45309,stroke:#78350F,color:#FFFFFF
+    classDef out    fill:#059669,stroke:#065F46,color:#FFFFFF
 
-    style KR fill:#0F172A08,stroke:#64748B,stroke-width:1px
-    style US fill:#0F172A08,stroke:#64748B,stroke-width:1px
-    style CX fill:#0F172A08,stroke:#64748B,stroke-width:1px
+    class K,SH,YF,EX,F,NW source
+    class AF,DB move
+    class Q,O,AT,CR out
 
-    %% 0-5: 실제 데이터 흐름 / 6-7: 서브그래프 세로 정렬용 (숨김)
-    linkStyle 0,1,2,3,4,5 stroke:#94A3B8,stroke-width:1.5px
-    linkStyle 6,7 stroke-width:0px,stroke:none,fill:none
+    style KR  fill:#0F172A08,stroke:#64748B
+    style US  fill:#0F172A08,stroke:#64748B
+    style CX  fill:#0F172A08,stroke:#64748B
+    style SVC fill:#0F172A08,stroke:#64748B,stroke-dasharray:4 3
 ```
+
+<sub>Blue — data sources · amber — collection &amp; storage · green — research &amp; engines. Dashed — standalone services.</sub>
 
 | Project | What it is |
 |---|---|
