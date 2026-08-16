@@ -35,17 +35,17 @@ Selected peer-reviewed work — optimization theory first, then the same machine
 
 <h3><img src="https://img.shields.io/badge/%F0%9F%94%AD%20OPEN--SOURCE-059669?style=for-the-badge&labelColor=1E293B" height="26" alt="Open-source"/></h3>
 
-Three independent stacks — **Korean equities** (own APIs → Airflow → TimescaleDB → research), **US equities** (point-in-time factor engine), and **crypto** (exchange APIs → backtest↔live engine).
+Three independent stacks — **Korean equities** (collection → TimescaleDB → research), **US equities** (point-in-time factor engine), and **crypto** (exchange APIs → backtest↔live engine). The two REST APIs stand on their own; they serve data directly rather than feeding the pipeline.
 
 ```mermaid
 flowchart TD
     subgraph KR ["🇰🇷 Korean equities"]
         direction TB
         K["🔌 kiwoom-rest-api"] --> AF
-        F["🔌 krx-fundamentals-api"] --> AF
-        NW["🔌 krx-news-rest-api"] --> AF
-        AF["🗄️ quant-airflow"] --> DB[("TimescaleDB<br/>delisted incl.")]
+        AF["🗄️ quant-airflow<br/>DART · KRX · Naver collectors"] --> DB[("TimescaleDB<br/>delisted incl.")]
         DB --> Q["🧪 kr-quant"]
+        F["🔌 krx-fundamentals-api"]
+        NW["🔌 krx-news-rest-api"]
     end
 
     subgraph US ["🇺🇸 US equities"]
@@ -77,9 +77,9 @@ flowchart TD
     style US fill:#0F172A08,stroke:#64748B,stroke-width:1px
     style CX fill:#0F172A08,stroke:#64748B,stroke-width:1px
 
-    %% 0-7: 실제 데이터 흐름 / 8-9: 서브그래프 세로 정렬용 (숨김)
-    linkStyle 0,1,2,3,4,5,6,7 stroke:#94A3B8,stroke-width:1.5px
-    linkStyle 8,9 stroke-width:0px,stroke:none,fill:none
+    %% 0-5: 실제 데이터 흐름 / 6-7: 서브그래프 세로 정렬용 (숨김)
+    linkStyle 0,1,2,3,4,5 stroke:#94A3B8,stroke-width:1.5px
+    linkStyle 6,7 stroke-width:0px,stroke:none,fill:none
 ```
 
 | Project | What it is |
