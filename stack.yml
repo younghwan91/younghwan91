@@ -1,0 +1,55 @@
+# 오픈소스 퀀트 스택 — 레포 간 "관련 프로젝트" 푸터의 단일 진실 원천(SSOT).
+#
+# 각 레포 README 하단의 푸터 표는 손으로 쓰지 않는다. scripts/sync_stack_footer.py 가
+# 이 파일에서 생성해 주입한다. 손으로 고치면 다음 동기화에서 덮어써진다.
+#
+# 규칙 — 설명에 숫자를 쓰지 않는다.
+#   "207개 엔드포인트" 같은 수치를 8개 레포에 복사해 둔 결과, 실제 값이 186으로
+#   바뀐 뒤에도 7개 레포가 몇 달간 틀린 숫자로 서로를 소개했다. 숫자는 해당
+#   레포의 README 본문에서만 관리한다.
+
+axes:
+  kr: { mark: "🇰🇷", ko: "한국 주식", en: "Korean equities" }
+  us: { mark: "🇺🇸", ko: "미국 주식", en: "US equities" }
+  cx: { mark: "₿",  ko: "암호화폐",  en: "Crypto" }
+
+repos:
+  - name: kiwoom-rest-api
+    axis: kr
+    ko: "키움증권 REST API Python 라이브러리 — 국내주식 엔드포인트 전수·실시간 WebSocket, sync + async (`pip install kiwoom-client`)"
+    en: "Kiwoom Securities REST API client — full domestic-equity endpoint coverage, real-time WebSocket, sync + async (`pip install kiwoom-client`)"
+
+  - name: krx-fundamentals-api
+    axis: kr
+    ko: "국내 기업 펀더멘탈 REST API — 재무제표·투자지표·배당·종목 스크리닝 (DART + KRX + 네이버)"
+    en: "Korean corporate fundamentals REST API — financial statements, valuation, dividends, screening (DART + KRX + Naver)"
+
+  - name: krx-news-rest-api
+    axis: kr
+    ko: "한국 주식 뉴스·공시 수집 REST API (FastAPI + Redis)"
+    en: "Korean market news & disclosure collection API (FastAPI + Redis)"
+
+  - name: quant-airflow
+    axis: kr
+    ko: "시세·수급·실적을 TimescaleDB 로 수집하는 Airflow 파이프라인 — 상장폐지 종목까지 담아 생존편향을 막는다"
+    en: "Airflow pipeline collecting Korean market data into TimescaleDB — delisted names included, so downstream backtests aren't survivorship-biased"
+
+  - name: kr-quant
+    axis: kr
+    ko: "코스피·코스닥 알파 리서치 — walk-forward·랜덤 음성대조·purged CV·Deflated Sharpe 를 CI 가드레일로 강제"
+    en: "KOSPI/KOSDAQ alpha research — walk-forward, random null controls, purged CV and Deflated Sharpe enforced as CI guardrails"
+
+  - name: opt_portfolio
+    axis: us
+    ko: "미국주식 팩터 엔진 — point-in-time·생존편향 보정 데이터 위에서 walk-forward 를 Deflated Sharpe 로 게이팅 (+ VAA 자산배분 백테스터)"
+    en: "US equity factor engine — walk-forward gated by Deflated Sharpe on point-in-time, survivorship-bias-free data (plus a VAA allocation backtester)"
+
+  - name: automated-stock-trading-systems
+    axis: us
+    ko: "Bensdorp 의 7개 비상관 트레이딩 시스템 백테스터 (교육용 재구현)"
+    en: "Backtester for Bensdorp's seven non-correlated trading systems (educational reimplementation)"
+
+  - name: quantbox-engine
+    axis: cx
+    ko: "암호화폐 선물 백테스트·실행 엔진 — 룩어헤드 0, 백테스트↔실거래 일체화"
+    en: "Crypto futures backtest & execution engine — zero lookahead, backtest↔live parity"
