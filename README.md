@@ -34,7 +34,7 @@ flowchart TB
 
     subgraph US ["🇺🇸 US equities"]
         direction LR
-        SH["Sharadar"] --> O["opt_portfolio"]
+        SH["Sharadar"] --> O["portfolio-research"]
         YF["yfinance"] --> AT["automated-stock-trading-systems"]
     end
 
@@ -76,7 +76,7 @@ flowchart TB
 | **[krx-fundamentals-api](https://github.com/younghwan91/krx-fundamentals-api)**<br/><img src="https://img.shields.io/badge/DATA%20SOURCE-2563EB?style=flat-square&labelColor=1E293B" alt="DATA SOURCE"/> | Korean corporate fundamentals API — financial statements, valuation metrics, dividends, major shareholders &amp; stock screening (DART + KRX + Naver) |
 | **[krx-news-rest-api](https://github.com/younghwan91/krx-news-rest-api)**<br/><img src="https://img.shields.io/badge/DATA%20SOURCE-2563EB?style=flat-square&labelColor=1E293B" alt="DATA SOURCE"/> | Korean market news &amp; disclosure collection API (FastAPI + Redis) |
 | **[kr-quant](https://github.com/younghwan91/kr-quant)**<br/><img src="https://img.shields.io/badge/RESEARCH-059669?style=flat-square&labelColor=1E293B" alt="RESEARCH"/> | KOSPI/KOSDAQ alpha research at the trade-distribution level — walk-forward, random null controls, purged CV, Deflated Sharpe &amp; survivorship-corrected universes, all **enforced as CI guardrails**. Findings so far: alpha splits into **convex** (tail-driven) vs **diffuse** types; PEAD is the validated diffuse one; and restoring delisted names *raised* its excess return — survivorship bias distorts the benchmark more than the strategy |
-| **[opt_portfolio](https://github.com/younghwan91/opt_portfolio)**<br/><img src="https://img.shields.io/badge/RESEARCH-059669?style=flat-square&labelColor=1E293B" alt="RESEARCH"/> | US equity factor engine — **158 factors over 21,963 tickers (1997–2026)**, point-in-time &amp; survivorship-bias-free, walk-forward optimization gated by Deflated Sharpe · plus a VAA tactical asset allocation backtester |
+| **[portfolio-research](https://github.com/younghwan91/portfolio-research)**<br/><img src="https://img.shields.io/badge/RESEARCH-059669?style=flat-square&labelColor=1E293B" alt="RESEARCH"/> | US equity factor engine — **158 factors over 20,931 tickers (1997–2026)**, point-in-time &amp; survivorship-bias-free, walk-forward validation gated by Deflated Sharpe and PBO · plus tactical ETF allocation |
 | **[automated-stock-trading-systems](https://github.com/younghwan91/automated-stock-trading-systems)**<br/><img src="https://img.shields.io/badge/RESEARCH-059669?style=flat-square&labelColor=1E293B" alt="RESEARCH"/> | Backtester for Bensdorp's 7 non-correlated systems |
 
 🔒 **Also private** — equity screeners (Wyckoff accumulation · Minervini + VCP), a statistical-arbitrage crypto engine, and live trading systems. *Available on request.*
