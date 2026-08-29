@@ -29,6 +29,11 @@ repos:
     ko: "한국 주식 뉴스·공시 수집 REST API (FastAPI + Redis)"
     en: "Korean market news & disclosure collection API (FastAPI + Redis)"
 
+  - name: fin-checkup
+    axis: kr
+    ko: "관심종목 위험 공시 텔레그램 알림 + DART·SEC 재무 건강검진 — 측정값과 사실만 전달한다"
+    en: "Telegram alerts for risk disclosures + a DART/SEC financial health checkup — reports measurements and facts, never a recommendation"
+
   - name: quant-airflow
     axis: kr
     ko: "시세·수급·실적을 TimescaleDB 로 수집하는 Airflow 파이프라인 — 상장폐지 종목까지 담아 생존편향을 막는다"
@@ -39,10 +44,10 @@ repos:
     ko: "코스피·코스닥 알파 리서치 — walk-forward·랜덤 음성대조·purged CV·Deflated Sharpe 를 CI 가드레일로 강제"
     en: "KOSPI/KOSDAQ alpha research — walk-forward, random null controls, purged CV and Deflated Sharpe enforced as CI guardrails"
 
-  - name: opt_portfolio
+  - name: portfolio-research
     axis: us
-    ko: "미국주식 팩터 엔진 — point-in-time·생존편향 보정 데이터 위에서 walk-forward 를 Deflated Sharpe 로 게이팅 (+ VAA 자산배분 백테스터)"
-    en: "US equity factor engine — walk-forward gated by Deflated Sharpe on point-in-time, survivorship-bias-free data (plus a VAA allocation backtester)"
+    ko: "미국주식 팩터 엔진 — point-in-time·생존편향 보정 데이터 위에서 walk-forward 를 Deflated Sharpe·PBO 로 게이팅 (+ ETF 전술배분 TAA — 9개 사전등록, 채택 0)"
+    en: "US equity factor engine — walk-forward gated by Deflated Sharpe and PBO on point-in-time, survivorship-bias-free data (plus tactical ETF allocation: 9 pre-registered, 0 adopted)"
 
   - name: automated-stock-trading-systems
     axis: us
