@@ -22,7 +22,7 @@ Three stacks that share a shape — **collect → store → research**. One Airf
 flowchart TB
     subgraph KR ["🇰🇷 Korean equities"]
         direction LR
-        K["kiwoom-rest-api"] --> AF["quant-airflow<br/>DART · KRX · Naver"] --> DB[("TimescaleDB<br/>delisted included")] --> Q["kr-quant"]
+        K["kiwoom-client"] --> AF["quant-airflow<br/>DART · KRX · Naver"] --> DB[("TimescaleDB<br/>delisted included")] --> Q["kr-quant"]
     end
 
     subgraph US ["🇺🇸 US equities"]
@@ -64,7 +64,7 @@ flowchart TB
 
 | Project | What it is |
 |---|---|
-| **[kiwoom-rest-api](https://github.com/younghwan91/kiwoom-rest-api)**<br/><img src="https://img.shields.io/badge/DATA%20SOURCE-2563EB?style=flat-square&labelColor=1E293B" alt="DATA SOURCE"/> | Kiwoom Securities REST API wrapper — full domestic-equity endpoint coverage &amp; real-time WebSocket feeds · sync + async, auto token refresh · **`pip install kiwoom-client`** <a href="https://pypi.org/project/kiwoom-client/"><img src="https://img.shields.io/pypi/dm/kiwoom-client?style=flat-square&label=PyPI&color=2563EB&labelColor=1E293B" alt="PyPI downloads"/></a> |
+| **[kiwoom-client](https://github.com/younghwan91/kiwoom-client)**<br/><img src="https://img.shields.io/badge/DATA%20SOURCE-2563EB?style=flat-square&labelColor=1E293B" alt="DATA SOURCE"/> | Kiwoom Securities REST API wrapper — full domestic-equity endpoint coverage &amp; real-time WebSocket feeds · sync + async, auto token refresh · **`pip install kiwoom-client`** <a href="https://pypi.org/project/kiwoom-client/"><img src="https://img.shields.io/pypi/dm/kiwoom-client?style=flat-square&label=PyPI&color=2563EB&labelColor=1E293B" alt="PyPI downloads"/></a> |
 | **[quant-airflow](https://github.com/younghwan91/quant-airflow)**<br/><img src="https://img.shields.io/badge/PIPELINE-7C3AED?style=flat-square&labelColor=1E293B" alt="PIPELINE"/> | The one pipeline behind both equity stacks — 12 DAGs. Korea: prices, supply/demand, earnings, consensus &amp; shares outstanding into TimescaleDB over DART · Kiwoom · KRX · Naver, with **delisted-stock backfill** so downstream backtests aren't survivorship-biased. US: a daily Sharadar bulk snapshot rebuilt into a DuckDB store and published atomically |
 | **[krx-fundamentals-api](https://github.com/younghwan91/krx-fundamentals-api)**<br/><img src="https://img.shields.io/badge/DATA%20SOURCE-2563EB?style=flat-square&labelColor=1E293B" alt="DATA SOURCE"/> | Korean corporate fundamentals API — financial statements, valuation metrics, dividends &amp; stock screening (DART + KRX + Naver), served cache-first |
 | **[krx-news-rest-api](https://github.com/younghwan91/krx-news-rest-api)**<br/><img src="https://img.shields.io/badge/DATA%20SOURCE-2563EB?style=flat-square&labelColor=1E293B" alt="DATA SOURCE"/> | Korean market news &amp; disclosure collection API (FastAPI + Redis) — one schema over sources that each word the same event differently |

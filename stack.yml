@@ -14,7 +14,7 @@ axes:
   cx: { mark: "₿",  ko: "암호화폐",  en: "Crypto" }
 
 repos:
-  - name: kiwoom-rest-api
+  - name: kiwoom-client
     axis: kr
     ko: "키움증권 REST API Python 라이브러리 — 국내주식 엔드포인트 전수·실시간 WebSocket, sync + async (`pip install kiwoom-client`)"
     en: "Kiwoom Securities REST API client — full domestic-equity endpoint coverage, real-time WebSocket, sync + async (`pip install kiwoom-client`)"
