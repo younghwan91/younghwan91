@@ -19,15 +19,15 @@ repos:
     ko: "키움증권 REST API Python 라이브러리 — 국내주식 엔드포인트 전수·실시간 WebSocket, sync + async (`pip install kiwoom-client`)"
     en: "Kiwoom Securities REST API client — full domestic-equity endpoint coverage, real-time WebSocket, sync + async (`pip install kiwoom-client`)"
 
-  - name: krx-fundamentals-api
+  - name: krx-fundamentals-client
     axis: kr
-    ko: "국내 기업 펀더멘탈 REST API — 재무제표·투자지표·배당·종목 스크리닝 (DART + KRX + 네이버)"
-    en: "Korean corporate fundamentals REST API — financial statements, valuation, dividends, screening (DART + KRX + Naver)"
+    ko: "국내 기업 펀더멘탈 Python 클라이언트 라이브러리 — 재무제표·투자지표·배당·종목 스크리닝 (DART + KRX + 네이버)"
+    en: "Korean corporate fundamentals Python client library — financial statements, valuation, dividends, screening (DART + KRX + Naver)"
 
-  - name: krx-news-rest-api
+  - name: krx-news-client
     axis: kr
-    ko: "한국 주식 뉴스·공시 수집 REST API (FastAPI + Redis)"
-    en: "Korean market news & disclosure collection API (FastAPI + Redis)"
+    ko: "한국 주식 뉴스·공시 수집 Python 클라이언트 라이브러리 (DART + 한국경제 + 더벨 + 토스)"
+    en: "Korean market news & disclosure Python client library (DART + Hankyung + TheBell + Toss)"
 
   - name: fin-checkup
     axis: kr
