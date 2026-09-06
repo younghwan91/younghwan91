@@ -26,12 +26,12 @@ flowchart TB
         NW["krx-news-client"] --> AF
         F["krx-fundamentals-client"] --> AF
         DB -- "news_judgments<br/>LLM judgment" --> SC["scalp-it"]
-        DB --> MS["macro-sector-agent"]
     end
 
     subgraph US ["🇺🇸 US equities"]
         direction LR
         SH["Sharadar"] --> AFU["quant-airflow<br/>bulk snapshot rebuild"] --> DD[("DuckDB<br/>point-in-time")] --> O["portfolio-research"]
+        SH --> MS["macro-sector-agent<br/>own PIT DuckDB"]
         YF["yfinance"] --> AT["automated-stock-trading-systems"]
     end
 
@@ -73,6 +73,7 @@ flowchart TB
 | **[fin-checkup](https://github.com/younghwan91/fin-checkup)**<br/><img src="https://img.shields.io/badge/TOOL-0891B2?style=flat-square&labelColor=1E293B" alt="TOOL"/> | Risk-disclosure alerts + a financial health checkup over **DART &amp; SEC EDGAR** — rights offerings, CB issues, audit opinions and delistings pushed to Telegram; 17 statement metrics read as a traffic-light chart against last year, the sector median and the peer percentile. **Reports measurements and facts only — never a recommendation** |
 | **[kr-quant](https://github.com/younghwan91/kr-quant)**<br/><img src="https://img.shields.io/badge/RESEARCH-059669?style=flat-square&labelColor=1E293B" alt="RESEARCH"/> | KOSPI/KOSDAQ alpha research at the trade-distribution level — walk-forward, random null controls, purged CV, Deflated Sharpe &amp; survivorship-corrected universes, all **enforced as CI guardrails**. **The rejections are the product** — pure noise clears “5 of 6 folds positive” 46% of the time, so the test is whether a strategy beats its own randomized version. A daily sector money-flow observation axis lives alongside it |
 | **[portfolio-research](https://github.com/younghwan91/portfolio-research)**<br/><img src="https://img.shields.io/badge/RESEARCH-059669?style=flat-square&labelColor=1E293B" alt="RESEARCH"/> | US equity factor engine — point-in-time &amp; survivorship-bias-free, walk-forward optimization gated by **Deflated Sharpe &amp; PBO** · plus tactical ETF allocation. **Ships the rejections too**: all 9 pre-registered TAA configs failed the PBO gate, and one headline number was retracted · [writeup](https://younghwan91.github.io/portfolio-research/) |
+| **[macro-sector-agent](https://github.com/younghwan91/macro-sector-agent)**<br/><img src="https://img.shields.io/badge/RESEARCH-059669?style=flat-square&labelColor=1E293B" alt="RESEARCH"/> | Top-down US sector-cycle research pipeline over its own Sharadar-fed point-in-time DuckDB — it asks **which industry has been forgotten**, not what to buy. The market is cut at a resolution standard sector labels can't show, and an LLM judge argues from evidence over whether a theme is a cycle trough or a structural death, sitting only at that narrow waist — everything above and below is deterministic. **The machine never picks — it only excludes**; strategy parameters stay out of the repo |
 | **[quantbox-engine](https://github.com/younghwan91/quantbox-engine)**<br/><img src="https://img.shields.io/badge/CRYPTO%20ENGINE-EA580C?style=flat-square&labelColor=1E293B" alt="CRYPTO ENGINE"/> | Crypto futures backtest &amp; execution engine — zero lookahead, backtest↔live parity. Exits are placed as exchange-side algo orders |
 | **[automated-stock-trading-systems](https://github.com/younghwan91/automated-stock-trading-systems)**<br/><img src="https://img.shields.io/badge/RESEARCH-059669?style=flat-square&labelColor=1E293B" alt="RESEARCH"/> | Backtester for Bensdorp's seven non-correlated trading systems (educational reimplementation) |
 
@@ -82,9 +83,8 @@ Strategies and parameters stay closed. Only structure and discipline are written
 
 | Project | What it is |
 |---|---|
-| **macro-sector-agent**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | Top-down sector-cycle research pipeline — it asks **which industry has been forgotten**, not what to buy. The market is cut at a resolution standard sector labels can't show, and agents argue from evidence over whether a theme is a cycle trough or a structural death. **The LLM sits only at the narrow waist**; everything above and below is deterministic. The machine never picks — it only excludes |
 | **scalp-it**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | Korean intraday strategy validation framework + live tick/orderbook collection — ticks cannot be backfilled, so a missed day is gone for good. **Pre-register, measure once.** No re-tuning to revive a rejected hypothesis |
-| **quantbox**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | Crypto pair-trading engine — statistical arbitrage. `quantbox-engine` is the public extract with the strategies removed |
+| **quantbox**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | Binance USDT-M futures breakout/momentum system — VR compression squeeze + MA cluster squeeze, live. `quantbox-engine` is the public extract with the strategies removed |
 | **momentum**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | US equity screener — Minervini Trend Template + VCP pattern, DuckDB-cached, CLI-driven |
 | **gpt-quant-v2**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | News-driven algorithmic trading experiment — sentiment analysis + ML signal generation over an MCP tool interface (archived) |
 | **trading_code**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | First iteration of the crypto pair-trading framework — predecessor of `quantbox` (archived) |
