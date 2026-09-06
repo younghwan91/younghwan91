@@ -24,6 +24,8 @@ flowchart TB
         direction LR
         K["kiwoom-client"] --> AF["quant-airflow<br/>DART · KRX · Naver · Toss"] --> DB[("TimescaleDB<br/>delisted included")] --> Q["kr-quant"]
         NW["krx-news-client"] --> AF
+        DB -- "news_judgments<br/>LLM judgment" --> SC["scalp-it"]
+        DB --> MS["macro-sector-agent"]
     end
 
     subgraph US ["🇺🇸 US equities"]
@@ -52,7 +54,7 @@ flowchart TB
 
     class K,SH,YF,EX,F,NW,FC source
     class AF,AFU,DB,DD move
-    class Q,O,AT,CR out
+    class Q,O,AT,CR,SC,MS out
 
     style KR  fill:#0F172A08,stroke:#64748B
     style US  fill:#0F172A08,stroke:#64748B
@@ -65,7 +67,7 @@ flowchart TB
 | Project | What it is |
 |---|---|
 | **[kiwoom-client](https://github.com/younghwan91/kiwoom-client)**<br/><img src="https://img.shields.io/badge/DATA%20SOURCE-2563EB?style=flat-square&labelColor=1E293B" alt="DATA SOURCE"/> | Kiwoom Securities REST API wrapper — full domestic-equity endpoint coverage &amp; real-time WebSocket feeds · sync + async, auto token refresh · **`pip install kiwoom-client`** <a href="https://pypi.org/project/kiwoom-client/"><img src="https://img.shields.io/pypi/dm/kiwoom-client?style=flat-square&label=PyPI&color=2563EB&labelColor=1E293B" alt="PyPI downloads"/></a> |
-| **[quant-airflow](https://github.com/younghwan91/quant-airflow)**<br/><img src="https://img.shields.io/badge/PIPELINE-7C3AED?style=flat-square&labelColor=1E293B" alt="PIPELINE"/> | The one pipeline behind both equity stacks — 14 DAGs. Korea: prices, supply/demand, earnings, consensus, shares outstanding &amp; news/disclosures (via krx-news-client) into TimescaleDB over DART · Kiwoom · KRX · Naver · Toss, with **delisted-stock backfill** so downstream backtests aren't survivorship-biased. US: a daily Sharadar bulk snapshot rebuilt into a DuckDB store and published atomically |
+| **[quant-airflow](https://github.com/younghwan91/quant-airflow)**<br/><img src="https://img.shields.io/badge/PIPELINE-7C3AED?style=flat-square&labelColor=1E293B" alt="PIPELINE"/> | The one pipeline behind both equity stacks — 16 DAGs. Korea: prices, supply/demand, earnings, consensus, shares outstanding &amp; news/disclosures (via krx-news-client) into TimescaleDB over DART · Kiwoom · KRX · Naver · Toss, with **delisted-stock backfill** so downstream backtests aren't survivorship-biased. Structured LLM judgments over that news/disclosure stream (event type, sentiment, staleness) feed scalp-it's intraday filtering. US: a daily Sharadar bulk snapshot rebuilt into a DuckDB store and published atomically |
 | **[krx-fundamentals-client](https://github.com/younghwan91/krx-fundamentals-client)**<br/><img src="https://img.shields.io/badge/DATA%20SOURCE-2563EB?style=flat-square&labelColor=1E293B" alt="DATA SOURCE"/> | Korean corporate fundamentals Python client library — financial statements (batched up to 100 tickers/call), valuation metrics, dividends &amp; stock screening (DART + KRX + Naver), no standing server |
 | **[krx-news-client](https://github.com/younghwan91/krx-news-client)**<br/><img src="https://img.shields.io/badge/DATA%20SOURCE-2563EB?style=flat-square&labelColor=1E293B" alt="DATA SOURCE"/> | Korean market news &amp; disclosure Python client library — DART filings + Toss Securities, one schema over sources that word the same event differently · feeds quant-airflow's `daily_news` DAG · **`pip install krx-news-client`** <a href="https://pypi.org/project/krx-news-client/"><img src="https://img.shields.io/pypi/dm/krx-news-client?style=flat-square&label=PyPI&color=2563EB&labelColor=1E293B" alt="PyPI downloads"/></a> |
 | **[fin-checkup](https://github.com/younghwan91/fin-checkup)**<br/><img src="https://img.shields.io/badge/TOOL-0891B2?style=flat-square&labelColor=1E293B" alt="TOOL"/> | Risk-disclosure alerts + a financial health checkup over **DART &amp; SEC EDGAR** — rights offerings, CB issues, audit opinions and delistings pushed to Telegram; 17 statement metrics read as a traffic-light chart against last year, the sector median and the peer percentile. **Reports measurements and facts only — never a recommendation** |
