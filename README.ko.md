@@ -27,6 +27,8 @@ flowchart TB
         NW["krx-news-client"] --> AF
         F["krx-fundamentals-client"] --> AF
         DB -- "news_judgments<br/>LLM 판단" --> SC["scalp-it"]
+        DB -- "시세, 읽기전용" --> KSIG["krx-signal-engine<br/>리스크 게이트"]
+        K --> KSIG
     end
 
     subgraph US ["🇺🇸 미국 주식"]
@@ -55,7 +57,7 @@ flowchart TB
 
     class K,SH,YF,EX,F,NW,FC source
     class AF,AFU,DB,DD move
-    class Q,O,AT,CR,SC,MS out
+    class Q,O,AT,CR,SC,MS,KSIG out
 
     style KR  fill:#0F172A08,stroke:#64748B
     style US  fill:#0F172A08,stroke:#64748B
@@ -67,7 +69,7 @@ flowchart TB
 
 | 프로젝트 | 무엇인가 |
 |---|---|
-| **[kiwoom-client](https://github.com/younghwan91/kiwoom-client)**<br/><img src="https://img.shields.io/badge/DATA%20SOURCE-2563EB?style=flat-square&labelColor=1E293B" alt="DATA SOURCE"/> | 키움증권 REST API 를 파이썬으로 감싼 라이브러리. 국내주식 엔드포인트를 빠짐없이 덮고 실시간 WebSocket 도 받는다. sync 와 async 를 모두 지원하고 토큰은 알아서 갱신한다. 예전 OpenAPI+ 처럼 32bit 윈도우에 묶이지 않아 리눅스 서버에서 그대로 돈다 · **`pip install kiwoom-client`** <a href="https://pypi.org/project/kiwoom-client/"><img src="https://img.shields.io/pypi/dm/kiwoom-client?style=flat-square&label=PyPI&color=2563EB&labelColor=1E293B" alt="PyPI downloads"/></a> |
+| **[kiwoom-client](https://github.com/younghwan91/kiwoom-client)**<br/><img src="https://img.shields.io/badge/DATA%20SOURCE-2563EB?style=flat-square&labelColor=1E293B" alt="DATA SOURCE"/> | 키움증권 REST API 를 파이썬으로 감싼 라이브러리. 국내주식 엔드포인트를 빠짐없이 덮고 실시간 WebSocket 도 받는다. sync 와 async 를 모두 지원하고 토큰은 알아서 갱신한다. 예전 OpenAPI+ 처럼 32bit 윈도우에 묶이지 않아 리눅스 서버에서 그대로 돈다. REST 엔드포인트 182개와 `condition_search` 를 통째로 노출하는 **MCP 서버**도 들어 있어 AI 에이전트가 바로 도구로 쓸 수 있다 — 실주문은 옵트인일 때만 · **`pip install kiwoom-client`** <a href="https://pypi.org/project/kiwoom-client/"><img src="https://img.shields.io/pypi/dm/kiwoom-client?style=flat-square&label=PyPI&color=2563EB&labelColor=1E293B" alt="PyPI downloads"/></a> |
 | **[quant-airflow](https://github.com/younghwan91/quant-airflow)**<br/><img src="https://img.shields.io/badge/PIPELINE-7C3AED?style=flat-square&labelColor=1E293B" alt="PIPELINE"/> | 두 주식 스택에 데이터를 대는 파이프라인 — DAG 16개. 한국 쪽은 시세·수급·실적·컨센서스·상장주식수·뉴스공시(krx-fundamentals-client·krx-news-client 경유)를 DART·키움·KRX·네이버·토스에서 모아 TimescaleDB 에 쌓는다. **상장폐지 종목까지 되살려 담기 때문에** 이 데이터로 만든 백테스트는 생존편향에 빠지지 않는다. 그 뉴스·공시 스트림을 LLM이 구조화 판단(이벤트 유형·감성·재탕 여부)으로 바꿔 scalp-it의 장중 필터링에 공급한다. 미국 쪽은 Sharadar 스냅샷을 매일 통째로 받아 DuckDB 스토어를 새로 만든 뒤 한 번에 갈아끼운다 |
 | **[krx-fundamentals-client](https://github.com/younghwan91/krx-fundamentals-client)**<br/><img src="https://img.shields.io/badge/DATA%20SOURCE-2563EB?style=flat-square&labelColor=1E293B" alt="DATA SOURCE"/> | 국내 기업 펀더멘탈 Python 클라이언트 라이브러리. 재무제표(최대 100종목씩 배치 조회)와 투자지표, 배당, 종목 스크리닝을 DART·KRX·네이버에서 모아 정규화한다. 상시 서버 없이 호출 시점에 소스에 직접 요청한다 · quant-airflow 의 실적·주식수·컨센서스 DAG 가 이걸 쓴다 |
 | **[krx-news-client](https://github.com/younghwan91/krx-news-client)**<br/><img src="https://img.shields.io/badge/DATA%20SOURCE-2563EB?style=flat-square&labelColor=1E293B" alt="DATA SOURCE"/> | 한국 주식 뉴스와 공시를 모아 주는 Python 클라이언트 라이브러리 — DART 공시 + 토스증권 뉴스. 매체마다 같은 사건을 조금씩 다르게 쓰는데, 그걸 한 스키마로 눕혀서 내준다 · quant-airflow 의 `daily_news` DAG 가 이걸 쓴다 · **`pip install krx-news-client`** <a href="https://pypi.org/project/krx-news-client/"><img src="https://img.shields.io/pypi/dm/krx-news-client?style=flat-square&label=PyPI&color=2563EB&labelColor=1E293B" alt="PyPI downloads"/></a> |
@@ -87,7 +89,7 @@ flowchart TB
 | **scalp-it**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | 국내 단타 전략을 검증하는 프레임워크와 장중 실시간 틱·호가 수집기. 틱은 나중에 받아올 방법이 없어서 그날 놓치면 영원히 없다. **사전등록하고 딱 한 번만 잰다.** 기각된 걸 살리려고 파라미터를 바꾸지 않는다 |
 | **quantbox**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | 바이낸스 USDT-M 선물 브레이크아웃/모멘텀 시스템 — VR 압축 스퀴즈 + MA 클러스터 스퀴즈, 실거래 운용 중. 공개된 `quantbox-engine` 은 여기서 전략만 걷어낸 것이다 |
 | **momentum**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | 미국주식 스크리너. Minervini 추세 템플릿과 VCP 패턴을 DuckDB 캐시 위에 올려 CLI 로 돌린다 |
-| **gpt-quant-v2**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | 뉴스로 매매 신호를 만들어 본 실험. 감성 분석과 ML 을 붙이고 MCP 도구로 노출했다 (지금은 아카이브) |
+| **krx-signal-engine**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | 국내주식(코스피·코스닥) 트레이딩 시스템. DART 공시 리스크 게이트가 ML·감성 신호와 별개로 진입을 막고 중대 공시에서는 강제 청산까지 한다. `quant-airflow` 를 읽기전용으로 조회하고 키움 브로커 어댑터로 주문을 낸다. 미국 시장 뉴스-감성 실험이던 `gpt-quant-v2` 를 국내주식용으로 다시 짰고, 아직 짓는 중이다 — 비용 모델과 리스크 게이트는 실물이지만 백테스트 대상 전략은 아직 자리표시자 스텁이다 |
 | **trading_code**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | 암호화폐 페어 트레이딩 프레임워크의 첫 판. `quantbox` 가 여기서 나왔다 (아카이브) |
 | **resume-private**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | 이력서 비공개 원본 (LaTeX) |
 

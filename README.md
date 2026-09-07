@@ -26,6 +26,8 @@ flowchart TB
         NW["krx-news-client"] --> AF
         F["krx-fundamentals-client"] --> AF
         DB -- "news_judgments<br/>LLM judgment" --> SC["scalp-it"]
+        DB -- "prices, read-only" --> KSIG["krx-signal-engine<br/>risk gate"]
+        K --> KSIG
     end
 
     subgraph US ["🇺🇸 US equities"]
@@ -54,7 +56,7 @@ flowchart TB
 
     class K,SH,YF,EX,F,NW,FC source
     class AF,AFU,DB,DD move
-    class Q,O,AT,CR,SC,MS out
+    class Q,O,AT,CR,SC,MS,KSIG out
 
     style KR  fill:#0F172A08,stroke:#64748B
     style US  fill:#0F172A08,stroke:#64748B
@@ -66,7 +68,7 @@ flowchart TB
 
 | Project | What it is |
 |---|---|
-| **[kiwoom-client](https://github.com/younghwan91/kiwoom-client)**<br/><img src="https://img.shields.io/badge/DATA%20SOURCE-2563EB?style=flat-square&labelColor=1E293B" alt="DATA SOURCE"/> | Kiwoom Securities REST API wrapper — full domestic-equity endpoint coverage &amp; real-time WebSocket feeds · sync + async, auto token refresh · **`pip install kiwoom-client`** <a href="https://pypi.org/project/kiwoom-client/"><img src="https://img.shields.io/pypi/dm/kiwoom-client?style=flat-square&label=PyPI&color=2563EB&labelColor=1E293B" alt="PyPI downloads"/></a> |
+| **[kiwoom-client](https://github.com/younghwan91/kiwoom-client)**<br/><img src="https://img.shields.io/badge/DATA%20SOURCE-2563EB?style=flat-square&labelColor=1E293B" alt="DATA SOURCE"/> | Kiwoom Securities REST API wrapper — full domestic-equity endpoint coverage &amp; real-time WebSocket feeds · sync + async, auto token refresh · ships an **MCP server** exposing all 182 REST endpoints plus `condition_search` as AI-agent tools, real-order calls opt-in only · **`pip install kiwoom-client`** <a href="https://pypi.org/project/kiwoom-client/"><img src="https://img.shields.io/pypi/dm/kiwoom-client?style=flat-square&label=PyPI&color=2563EB&labelColor=1E293B" alt="PyPI downloads"/></a> |
 | **[quant-airflow](https://github.com/younghwan91/quant-airflow)**<br/><img src="https://img.shields.io/badge/PIPELINE-7C3AED?style=flat-square&labelColor=1E293B" alt="PIPELINE"/> | The one pipeline behind both equity stacks — 16 DAGs. Korea: prices, supply/demand, earnings, consensus, shares outstanding &amp; news/disclosures (via krx-fundamentals-client &amp; krx-news-client) into TimescaleDB over DART · Kiwoom · KRX · Naver · Toss, with **delisted-stock backfill** so downstream backtests aren't survivorship-biased. Structured LLM judgments over that news/disclosure stream (event type, sentiment, staleness) feed scalp-it's intraday filtering. US: a daily Sharadar bulk snapshot rebuilt into a DuckDB store and published atomically |
 | **[krx-fundamentals-client](https://github.com/younghwan91/krx-fundamentals-client)**<br/><img src="https://img.shields.io/badge/DATA%20SOURCE-2563EB?style=flat-square&labelColor=1E293B" alt="DATA SOURCE"/> | Korean corporate fundamentals Python client library — financial statements (batched up to 100 tickers/call), valuation metrics, dividends &amp; stock screening (DART + KRX + Naver), no standing server · feeds quant-airflow's earnings/shares/consensus DAGs |
 | **[krx-news-client](https://github.com/younghwan91/krx-news-client)**<br/><img src="https://img.shields.io/badge/DATA%20SOURCE-2563EB?style=flat-square&labelColor=1E293B" alt="DATA SOURCE"/> | Korean market news &amp; disclosure Python client library — DART filings + Toss Securities, one schema over sources that word the same event differently · feeds quant-airflow's `daily_news` DAG · **`pip install krx-news-client`** <a href="https://pypi.org/project/krx-news-client/"><img src="https://img.shields.io/pypi/dm/krx-news-client?style=flat-square&label=PyPI&color=2563EB&labelColor=1E293B" alt="PyPI downloads"/></a> |
@@ -86,7 +88,7 @@ Strategies and parameters stay closed. Only structure and discipline are written
 | **scalp-it**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | Korean intraday strategy validation framework + live tick/orderbook collection — ticks cannot be backfilled, so a missed day is gone for good. **Pre-register, measure once.** No re-tuning to revive a rejected hypothesis |
 | **quantbox**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | Binance USDT-M futures breakout/momentum system — VR compression squeeze + MA cluster squeeze, live. `quantbox-engine` is the public extract with the strategies removed |
 | **momentum**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | US equity screener — Minervini Trend Template + VCP pattern, DuckDB-cached, CLI-driven |
-| **gpt-quant-v2**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | News-driven algorithmic trading experiment — sentiment analysis + ML signal generation over an MCP tool interface (archived) |
+| **krx-signal-engine**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | Korean-equity (KOSPI/KOSDAQ) trading system — a DART-disclosure risk gate blocks entries and force-exits on hard-severity events independent of the ML/sentiment path, over a read-only `quant-airflow` reader and a Kiwoom broker adapter. Redeveloped from `gpt-quant-v2` (a US-market news-sentiment experiment) into a Korean-equity system; still mid-build — the cost model and risk gate are real, but the strategy under test is a placeholder stub |
 | **trading_code**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | First iteration of the crypto pair-trading framework — predecessor of `quantbox` (archived) |
 | **resume-private**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | Private résumé source (LaTeX) |
 
