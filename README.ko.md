@@ -93,6 +93,56 @@ flowchart TB
 | **trading_code**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | 암호화폐 페어 트레이딩 프레임워크의 첫 판. `quantbox` 가 여기서 나왔다 (아카이브) |
 | **resume-private**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | 이력서 비공개 원본 (LaTeX) |
 
+<h3><img src="https://img.shields.io/badge/%F0%9F%96%A5%EF%B8%8F%20%EC%9A%B4%EC%98%81-0F766E?style=for-the-badge&labelColor=1E293B" height="26" alt="운영"/></h3>
+
+여기 적힌 것들은 레포로만 있는 게 아니라 지금도 돌고 있다. **레포는 같이 쓰지만 하는 일이 다른 두 호스트**로 나뉜다. 선을 긋는 규칙은 한 줄이다 — **다시 못 하는 일은 `trader` 에 남고, 다시 돌릴 수 있는 일은 `simnode` 로 간다.** 틱과 호가는 소급 수집이 안 되니 장중 한 시간을 놓치면 영원히 없지만, 실패한 배치는 내일 다시 돌리면 그만이다.
+
+```mermaid
+flowchart LR
+    subgraph T ["🖥️ trader — 라이브, 24/7"]
+        direction TB
+        SC["scalp-it<br/>틱·호가 실시간 수집"]
+        QB["quantbox"]
+        KSE["krx-signal-engine"]
+        RP[("TimescaleDB<br/>읽기전용 리플리카")]
+    end
+
+    subgraph S ["🖥️ simnode — 재현 가능, 24/7"]
+        direction TB
+        AF["quant-airflow<br/>스케줄러 · 웹서버"]
+        PR[("TimescaleDB<br/>PRIMARY")]
+        RS["kr-quant · portfolio-research<br/>macro-sector-agent · momentum<br/>장 마감 후 분석 배치"]
+    end
+
+    SC -- "LAN 너머로 틱 기록<br/>재연결 + 디스크 스풀" --> PR
+    AF --> PR
+    PR -- "스트리밍 복제" --> RP
+    PR --> RS
+
+    classDef live fill:#B45309,stroke:#78350F,color:#FFFFFF
+    classDef repro fill:#059669,stroke:#065F46,color:#FFFFFF
+    classDef store fill:#2563EB,stroke:#1E40AF,color:#FFFFFF
+
+    class SC,QB,KSE live
+    class AF,RS repro
+    class RP,PR store
+
+    style T fill:#0F172A08,stroke:#64748B
+    style S fill:#0F172A08,stroke:#64748B
+```
+
+| | **`trader`** — 라이브 머신 | **`simnode`** — 리서치 머신 |
+|---|---|---|
+| **역할** | 되돌릴 수 없고 시계에 묶인 일 — 장중은 한 번뿐이다 | 다시 돌릴 수 있는 일 — 오케스트레이션·배치·리서치 |
+| **도는 것** | `scalp-it` 실시간 틱·호가 수집 · `quantbox` · `krx-signal-engine` · `kiwoom-client` 개발 — 브로커 세션은 키 하나당 하나라 그 세션이 여기 있다 | Airflow 스케줄러·웹서버(16개 DAG) · TimescaleDB **PRIMARY** · `kr-quant`·`portfolio-research`·`macro-sector-agent`·`momentum` · 마감 후 집계 배치 전부 |
+| **공유 레포** | `quant-airflow` 와 `kr-quant` 는 **`git sparse-checkout`** 으로만 있다 — 리플리카 compose, 백업 스크립트, 스키마, `.env` 뿐 | 정본 전체 클론 |
+| **TimescaleDB** | 읽기전용 스트리밍 리플리카 | PRIMARY — 쓰기는 전부 여기로 |
+
+- **같은 레포가 양쪽에 있다고 양쪽 다 정본인 건 아니다.** 설정 수정은 `simnode` 의 전체 클론에서 하고 push 한다. `trader` 는 pull 만 한다 — sparse checkout 이라 거꾸로 하기가 어렵다.
+- **어느 쪽이 PRIMARY 인지는 코드가 아니라 상태다.** `pg_is_in_recovery()` 가 답하고, 그 답은 이미 한 번 뒤집혔다. 처음엔 LAN 순단에 수집기가 죽지 않도록 `trader` 가 PRIMARY 였는데, 수집기에 재연결과 디스크 스풀이 들어가 순단을 스스로 버티는 게 운영에서 확인된 날 `simnode` 로 승격했다. 강등된 쪽은 리플리카로 재구성했다 — compose 파일 이름까지 그대로 둔 채.
+- **배치를 옮겨도 시각은 안 옮겼다.** 크론 트리거는 호스트가 아니라 DB 에서 데이터가 확정되는 시점에 맞춰져 있어서, 분리 전후의 스케줄이 똑같이 읽힌다.
+- 반대로 **꺼야 했던 것** 하나 — 내려간 DB 컨테이너를 되살리는 헬스 가드다. 그대로 뒀으면 강등된 옛 PRIMARY 를 깨워 split-brain 을 만들었을 것이다. 스크립트 파일은 `trader` 가 다시 PRIMARY 를 맡을 날을 위해 디스크에 남겨뒀다.
+
 <h3><img src="https://img.shields.io/badge/%F0%9F%9B%A0%EF%B8%8F%20TECH-7C3AED?style=for-the-badge&labelColor=1E293B" height="26" alt="Tech"/></h3>
 
 <p>

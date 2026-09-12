@@ -92,6 +92,56 @@ Strategies and parameters stay closed. Only structure and discipline are written
 | **trading_code**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | First iteration of the crypto pair-trading framework — predecessor of `quantbox` (archived) |
 | **resume-private**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | Private résumé source (LaTeX) |
 
+<h3><img src="https://img.shields.io/badge/%F0%9F%96%A5%EF%B8%8F%20OPERATIONS-0F766E?style=for-the-badge&labelColor=1E293B" height="26" alt="Operations"/></h3>
+
+Most of these aren't just repos — they're running right now, across **two hosts that share the same repos but not the same job**. One rule draws the line: **what can't be redone stays on `trader`; what can be rerun lives on `simnode`.** Ticks and orderbook snapshots can't be backfilled, so a missed market hour is gone for good — a failed batch is just rerun tomorrow.
+
+```mermaid
+flowchart LR
+    subgraph T ["🖥️ trader — live, 24/7"]
+        direction TB
+        SC["scalp-it<br/>tick + orderbook collector"]
+        QB["quantbox"]
+        KSE["krx-signal-engine"]
+        RP[("TimescaleDB<br/>read-only replica")]
+    end
+
+    subgraph S ["🖥️ simnode — reproducible, 24/7"]
+        direction TB
+        AF["quant-airflow<br/>scheduler · webserver"]
+        PR[("TimescaleDB<br/>PRIMARY")]
+        RS["kr-quant · portfolio-research<br/>macro-sector-agent · momentum<br/>post-close analysis batches"]
+    end
+
+    SC -- "ticks written over the LAN<br/>reconnect + disk spool" --> PR
+    AF --> PR
+    PR -- "streaming replication" --> RP
+    PR --> RS
+
+    classDef live fill:#B45309,stroke:#78350F,color:#FFFFFF
+    classDef repro fill:#059669,stroke:#065F46,color:#FFFFFF
+    classDef store fill:#2563EB,stroke:#1E40AF,color:#FFFFFF
+
+    class SC,QB,KSE live
+    class AF,RS repro
+    class RP,PR store
+
+    style T fill:#0F172A08,stroke:#64748B
+    style S fill:#0F172A08,stroke:#64748B
+```
+
+| | **`trader`** — the live box | **`simnode`** — the research box |
+|---|---|---|
+| **Job** | Irreversible, wall-clock bound — market hours happen once | Reproducible — orchestration, batches, research |
+| **Runs** | `scalp-it` real-time tick/orderbook collection · `quantbox` · `krx-signal-engine` · `kiwoom-client` development, because a broker session is one-per-key and it lives here | Airflow scheduler &amp; webserver (16 DAGs) · TimescaleDB **PRIMARY** · `kr-quant`, `portfolio-research`, `macro-sector-agent`, `momentum` · every post-close aggregation batch |
+| **Shared repos** | `quant-airflow` and `kr-quant` exist here only as a **`git sparse-checkout`** — the replica's compose file, the backup script, the schema, a `.env` | The canonical full clones |
+| **TimescaleDB** | Read-only streaming replica | PRIMARY — every write lands here |
+
+- **The same repo on both hosts doesn't make both real.** Config edits are made in `simnode`'s full clone and pushed; `trader` only pulls. A sparse checkout makes that hard to get backwards.
+- **Which host is PRIMARY is state, not code** — `pg_is_in_recovery()` answers it, and the answer has already flipped once. The primary started on `trader` so the collector couldn't be killed by a LAN blip; it moved to `simnode` the day the collector grew reconnect + disk spooling and proved itself in production. The demoted host was rebuilt as the replica, compose file name and all.
+- **Moving a batch didn't move its clock.** Cron triggers are anchored to when the data is final in the DB, not to the host, so the schedule read identically before and after the split.
+- The one thing that had to be switched **off**: a health guard that restarts a downed DB container. Left running, it would have resurrected the demoted primary into a split brain. The script stays on disk for the day `trader` hosts the primary again.
+
 <h3><img src="https://img.shields.io/badge/%F0%9F%9B%A0%EF%B8%8F%20TECH-7C3AED?style=for-the-badge&labelColor=1E293B" height="26" alt="Tech"/></h3>
 
 <p>
