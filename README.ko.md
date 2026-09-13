@@ -27,7 +27,7 @@ flowchart TB
         NW["krx-news-client"] --> AF
         F["krx-fundamentals-client"] --> AF
         DB -- "news_judgments<br/>LLM 판단" --> SC["scalp-it"]
-        DB -- "시세, 읽기전용" --> KSIG["krx-signal-engine<br/>리스크 게이트"]
+        DB -- "시세, 읽기전용" --> KSIG["daytrade-it<br/>리스크 게이트"]
         K --> KSIG
     end
 
@@ -89,7 +89,7 @@ flowchart TB
 | **scalp-it**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | 국내 단타 전략을 검증하는 프레임워크와 장중 실시간 틱·호가 수집기. 틱은 나중에 받아올 방법이 없어서 그날 놓치면 영원히 없다. **사전등록하고 딱 한 번만 잰다.** 기각된 걸 살리려고 파라미터를 바꾸지 않는다 |
 | **quantbox**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | 바이낸스 USDT-M 선물 브레이크아웃/모멘텀 시스템 — VR 압축 스퀴즈 + MA 클러스터 스퀴즈, 실거래 운용 중. 공개된 `quantbox-engine` 은 여기서 전략만 걷어낸 것이다 |
 | **momentum**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | 미국주식 스크리너. Minervini 추세 템플릿과 VCP 패턴을 DuckDB 캐시 위에 올려 CLI 로 돌린다 |
-| **krx-signal-engine**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | 국내주식(코스피·코스닥) 트레이딩 시스템. DART 공시 리스크 게이트가 ML·감성 신호와 별개로 진입을 막고 중대 공시에서는 강제 청산까지 한다. `quant-airflow` 를 읽기전용으로 조회하고 키움 브로커 어댑터로 주문을 낸다. 미국 시장 뉴스-감성 실험이던 `gpt-quant-v2` 를 국내주식용으로 다시 짰고, 아직 짓는 중이다 — 비용 모델과 리스크 게이트는 실물이지만 백테스트 대상 전략은 아직 자리표시자 스텁이다 |
+| **daytrade-it**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | 국내주식(코스피·코스닥) 데이트레이딩 시스템. DART 공시 리스크 게이트가 ML·감성 신호와 별개로 진입을 막고 중대 공시에서는 강제 청산까지 한다. `quant-airflow` 를 읽기전용으로 조회하고 키움 브로커 어댑터로 주문을 낸다. 미국 시장 뉴스-감성 실험이던 `gpt-quant-v2` 를 국내주식용으로 다시 짰고(옛 이름 `krx-signal-engine`), 아직 짓는 중이다 — 비용 모델과 리스크 게이트는 실물이지만 백테스트 대상 전략은 아직 자리표시자 스텁이다 |
 | **trading_code**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | 암호화폐 페어 트레이딩 프레임워크의 첫 판. `quantbox` 가 여기서 나왔다 (아카이브) |
 | **resume-private**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | 이력서 비공개 원본 (LaTeX) |
 
@@ -103,7 +103,7 @@ flowchart LR
         direction TB
         SC["scalp-it<br/>틱·호가 실시간 수집"]
         QB["quantbox"]
-        KSE["krx-signal-engine"]
+        KSE["daytrade-it"]
         RP[("TimescaleDB<br/>읽기전용 리플리카")]
     end
 
@@ -134,7 +134,7 @@ flowchart LR
 | | **`trader`** — 라이브 머신 | **`simnode`** — 리서치 머신 |
 |---|---|---|
 | **역할** | 되돌릴 수 없고 시계에 묶인 일 — 장중은 한 번뿐이다 | 다시 돌릴 수 있는 일 — 오케스트레이션·배치·리서치 |
-| **도는 것** | `scalp-it` 실시간 틱·호가 수집 · `quantbox` · `krx-signal-engine` · `kiwoom-client` 개발 — 브로커 세션은 키 하나당 하나라 그 세션이 여기 있다 | Airflow 스케줄러·웹서버(16개 DAG) · TimescaleDB **PRIMARY** · `kr-quant`·`portfolio-research`·`macro-sector-agent`·`momentum` · 마감 후 집계 배치 전부 |
+| **도는 것** | `scalp-it` 실시간 틱·호가 수집 · `quantbox` · `daytrade-it` · `kiwoom-client` 개발 — 브로커 세션은 키 하나당 하나라 그 세션이 여기 있다 | Airflow 스케줄러·웹서버(16개 DAG) · TimescaleDB **PRIMARY** · `kr-quant`·`portfolio-research`·`macro-sector-agent`·`momentum` · 마감 후 집계 배치 전부 |
 | **공유 레포** | `quant-airflow` 와 `kr-quant` 는 **`git sparse-checkout`** 으로만 있다 — 리플리카 compose, 백업 스크립트, 스키마, `.env` 뿐 | 정본 전체 클론 |
 | **TimescaleDB** | 읽기전용 스트리밍 리플리카 | PRIMARY — 쓰기는 전부 여기로 |
 

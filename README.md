@@ -26,7 +26,7 @@ flowchart TB
         NW["krx-news-client"] --> AF
         F["krx-fundamentals-client"] --> AF
         DB -- "news_judgments<br/>LLM judgment" --> SC["scalp-it"]
-        DB -- "prices, read-only" --> KSIG["krx-signal-engine<br/>risk gate"]
+        DB -- "prices, read-only" --> KSIG["daytrade-it<br/>risk gate"]
         K --> KSIG
     end
 
@@ -88,7 +88,7 @@ Strategies and parameters stay closed. Only structure and discipline are written
 | **scalp-it**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | Korean intraday strategy validation framework + live tick/orderbook collection — ticks cannot be backfilled, so a missed day is gone for good. **Pre-register, measure once.** No re-tuning to revive a rejected hypothesis |
 | **quantbox**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | Binance USDT-M futures breakout/momentum system — VR compression squeeze + MA cluster squeeze, live. `quantbox-engine` is the public extract with the strategies removed |
 | **momentum**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | US equity screener — Minervini Trend Template + VCP pattern, DuckDB-cached, CLI-driven |
-| **krx-signal-engine**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | Korean-equity (KOSPI/KOSDAQ) trading system — a DART-disclosure risk gate blocks entries and force-exits on hard-severity events independent of the ML/sentiment path, over a read-only `quant-airflow` reader and a Kiwoom broker adapter. Redeveloped from `gpt-quant-v2` (a US-market news-sentiment experiment) into a Korean-equity system; still mid-build — the cost model and risk gate are real, but the strategy under test is a placeholder stub |
+| **daytrade-it**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | Korean-equity (KOSPI/KOSDAQ) day-trading system — a DART-disclosure risk gate blocks entries and force-exits on hard-severity events independent of the ML/sentiment path, over a read-only `quant-airflow` reader and a Kiwoom broker adapter. Redeveloped from `gpt-quant-v2` (a US-market news-sentiment experiment) into a Korean-equity system (formerly `krx-signal-engine`); still mid-build — the cost model and risk gate are real, but the strategy under test is a placeholder stub |
 | **trading_code**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | First iteration of the crypto pair-trading framework — predecessor of `quantbox` (archived) |
 | **resume-private**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | Private résumé source (LaTeX) |
 
@@ -102,7 +102,7 @@ flowchart LR
         direction TB
         SC["scalp-it<br/>tick + orderbook collector"]
         QB["quantbox"]
-        KSE["krx-signal-engine"]
+        KSE["daytrade-it"]
         RP[("TimescaleDB<br/>read-only replica")]
     end
 
@@ -133,7 +133,7 @@ flowchart LR
 | | **`trader`** — the live box | **`simnode`** — the research box |
 |---|---|---|
 | **Job** | Irreversible, wall-clock bound — market hours happen once | Reproducible — orchestration, batches, research |
-| **Runs** | `scalp-it` real-time tick/orderbook collection · `quantbox` · `krx-signal-engine` · `kiwoom-client` development, because a broker session is one-per-key and it lives here | Airflow scheduler &amp; webserver (16 DAGs) · TimescaleDB **PRIMARY** · `kr-quant`, `portfolio-research`, `macro-sector-agent`, `momentum` · every post-close aggregation batch |
+| **Runs** | `scalp-it` real-time tick/orderbook collection · `quantbox` · `daytrade-it` · `kiwoom-client` development, because a broker session is one-per-key and it lives here | Airflow scheduler &amp; webserver (16 DAGs) · TimescaleDB **PRIMARY** · `kr-quant`, `portfolio-research`, `macro-sector-agent`, `momentum` · every post-close aggregation batch |
 | **Shared repos** | `quant-airflow` and `kr-quant` exist here only as a **`git sparse-checkout`** — the replica's compose file, the backup script, the schema, a `.env` | The canonical full clones |
 | **TimescaleDB** | Read-only streaming replica | PRIMARY — every write lands here |
 
