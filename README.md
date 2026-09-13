@@ -25,9 +25,12 @@ flowchart TB
         K["kiwoom-client"] --> AF["quant-airflow<br/>DART · KRX · Naver · Toss"] --> DB[("TimescaleDB<br/>delisted included")] --> Q["kr-quant"]
         NW["krx-news-client"] --> AF
         F["krx-fundamentals-client"] --> AF
-        DB -- "news_judgments<br/>LLM judgment" --> SC["scalp-it"]
-        DB -- "prices, read-only" --> KSIG["daytrade-it<br/>risk gate"]
-        K --> KSIG
+        K --> SC["scalp-it"]
+        SC -- "ticks · orderbook" --> DB
+        DB -- "news_judgments<br/>shadow-scored only" --> SC
+        K --> KSIG["daytrade-it<br/>news → signal"]
+        NW -- "Toss news, direct" --> KSIG
+        DB -- "daily bars, read-only" --> KSIG
     end
 
     subgraph US ["🇺🇸 US equities"]
@@ -69,7 +72,7 @@ flowchart TB
 | Project | What it is |
 |---|---|
 | **[kiwoom-client](https://github.com/younghwan91/kiwoom-client)**<br/><img src="https://img.shields.io/badge/DATA%20SOURCE-2563EB?style=flat-square&labelColor=1E293B" alt="DATA SOURCE"/> | Kiwoom Securities REST API wrapper — full domestic-equity endpoint coverage &amp; real-time WebSocket feeds · sync + async, auto token refresh · ships an **MCP server** exposing all 182 REST endpoints plus `condition_search` as AI-agent tools, real-order calls opt-in only · **`pip install kiwoom-client`** <a href="https://pypi.org/project/kiwoom-client/"><img src="https://img.shields.io/pypi/dm/kiwoom-client?style=flat-square&label=PyPI&color=2563EB&labelColor=1E293B" alt="PyPI downloads"/></a> |
-| **[quant-airflow](https://github.com/younghwan91/quant-airflow)**<br/><img src="https://img.shields.io/badge/PIPELINE-7C3AED?style=flat-square&labelColor=1E293B" alt="PIPELINE"/> | The one pipeline behind both equity stacks — 16 DAGs. Korea: prices, supply/demand, earnings, consensus, shares outstanding &amp; news/disclosures (via krx-fundamentals-client &amp; krx-news-client) into TimescaleDB over DART · Kiwoom · KRX · Naver · Toss, with **delisted-stock backfill** so downstream backtests aren't survivorship-biased. Structured LLM judgments over that news/disclosure stream (event type, sentiment, staleness) feed scalp-it's intraday filtering. US: a daily Sharadar bulk snapshot rebuilt into a DuckDB store and published atomically |
+| **[quant-airflow](https://github.com/younghwan91/quant-airflow)**<br/><img src="https://img.shields.io/badge/PIPELINE-7C3AED?style=flat-square&labelColor=1E293B" alt="PIPELINE"/> | The one pipeline behind both equity stacks — 16 DAGs. Korea: prices, supply/demand, earnings, consensus, shares outstanding &amp; news/disclosures (via krx-fundamentals-client &amp; krx-news-client) into TimescaleDB over DART · Kiwoom · KRX · Naver · Toss, with **delisted-stock backfill** so downstream backtests aren't survivorship-biased. Structured LLM judgments over that news/disclosure stream (event type, sentiment, staleness) land in `news_judgments` — scalp-it scores them in shadow only; none of it reaches an order. US: a daily Sharadar bulk snapshot rebuilt into a DuckDB store and published atomically |
 | **[krx-fundamentals-client](https://github.com/younghwan91/krx-fundamentals-client)**<br/><img src="https://img.shields.io/badge/DATA%20SOURCE-2563EB?style=flat-square&labelColor=1E293B" alt="DATA SOURCE"/> | Korean corporate fundamentals Python client library — financial statements (batched up to 100 tickers/call), valuation metrics, dividends &amp; stock screening (DART + KRX + Naver), no standing server · feeds quant-airflow's earnings/shares/consensus DAGs |
 | **[krx-news-client](https://github.com/younghwan91/krx-news-client)**<br/><img src="https://img.shields.io/badge/DATA%20SOURCE-2563EB?style=flat-square&labelColor=1E293B" alt="DATA SOURCE"/> | Korean market news &amp; disclosure Python client library — DART filings + Toss Securities, one schema over sources that word the same event differently · feeds quant-airflow's `daily_news` DAG · **`pip install krx-news-client`** <a href="https://pypi.org/project/krx-news-client/"><img src="https://img.shields.io/pypi/dm/krx-news-client?style=flat-square&label=PyPI&color=2563EB&labelColor=1E293B" alt="PyPI downloads"/></a> |
 | **[fin-checkup](https://github.com/younghwan91/fin-checkup)**<br/><img src="https://img.shields.io/badge/TOOL-0891B2?style=flat-square&labelColor=1E293B" alt="TOOL"/> | Risk-disclosure alerts + a financial health checkup over **DART &amp; SEC EDGAR** — rights offerings, CB issues, audit opinions and delistings pushed to Telegram; 17 statement metrics read as a traffic-light chart against last year, the sector median and the peer percentile. **Reports measurements and facts only — never a recommendation** |
@@ -85,10 +88,10 @@ Strategies and parameters stay closed. Only structure and discipline are written
 
 | Project | What it is |
 |---|---|
-| **scalp-it**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | Korean intraday strategy validation framework + live tick/orderbook collection — ticks cannot be backfilled, so a missed day is gone for good. **Pre-register, measure once.** No re-tuning to revive a rejected hypothesis |
-| **quantbox**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | Binance USDT-M futures breakout/momentum system — VR compression squeeze + MA cluster squeeze, live. `binance-quant-engine` is the public extract with the strategies removed |
+| **scalp-it**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | Korean intraday strategy validation framework + live tick/orderbook collection + **a live execution loop** — since late August 2026 its detector sends real orders under a hard-capped order size, a price band, a daily order cap and a consecutive-loss kill switch. Ticks cannot be backfilled, so a missed day is gone for good. **Pre-register, measure once.** No re-tuning to revive a rejected hypothesis |
+| **quantbox**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | Binance USDT-M futures breakout/momentum system — VR compression squeeze + MA cluster squeeze. Traded live; the live bot is currently paused. `binance-quant-engine` is the public extract with the strategies removed |
 | **momentum**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | US equity screener — Minervini Trend Template + VCP pattern, DuckDB-cached, CLI-driven |
-| **daytrade-it**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | Korean-equity (KOSPI/KOSDAQ) day-trading system — a DART-disclosure risk gate blocks entries and force-exits on hard-severity events independent of the ML/sentiment path, over a read-only `quant-airflow` reader and a Kiwoom broker adapter. Redeveloped from `gpt-quant-v2` (a US-market news-sentiment experiment) into a Korean-equity system; still mid-build — the cost model and risk gate are real, but the strategy under test is a placeholder stub |
+| **daytrade-it**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | Korean-equity (KOSPI/KOSDAQ) day-trading system, the second live process on `trader`. A daemon polls Toss news, has Claude extract **facts only** — material type, persistence, direction, never a trade call — and records a signal only when a rule-based price check agrees. A price-only ML model was tried first and rejected: 38.5% accuracy against a 38.1% majority baseline. **The daemon never orders.** An order takes an explicit `execute_trade` call behind hard rails — 1 share, LIMIT only, a price band, a kill switch, no second entry into a held ticker. The DART hard-severity risk gate is built and adversarially tested, but not yet fed disclosures on that order path. Redeveloped from `gpt-quant-v2`, a US-market news-sentiment experiment |
 | **crypto-pair-trading**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | First iteration of the crypto pair-trading framework — predecessor of `quantbox` |
 | **resume-private**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | Private résumé source (LaTeX) |
 
@@ -97,49 +100,110 @@ Strategies and parameters stay closed. Only structure and discipline are written
 Most of these aren't just repos — they're running right now, across **two hosts that share the same repos but not the same job**. One rule draws the line: **what can't be redone stays on `trader`; what can be rerun lives on `simnode`.** Ticks and orderbook snapshots can't be backfilled, so a missed market hour is gone for good — a failed batch is just rerun tomorrow.
 
 ```mermaid
-flowchart LR
-    subgraph T ["🖥️ trader — live, 24/7"]
-        direction TB
-        SC["scalp-it<br/>tick + orderbook collector"]
-        QB["quantbox"]
-        KSE["daytrade-it"]
-        RP[("TimescaleDB<br/>read-only replica")]
+flowchart TB
+    KW(["Kiwoom<br/>one app key"])
+
+    subgraph T ["🖥️ trader — live"]
+        SC["scalp-it<br/>collector + live orders"]
+        DT["daytrade-it<br/>news → signal daemon"]
+        DD[("dart.db<br/>local SQLite")]
+        RP[("TimescaleDB<br/>standby replica<br/>no app reads it")]
     end
 
-    subgraph S ["🖥️ simnode — reproducible, 24/7"]
-        direction TB
-        AF["quant-airflow<br/>scheduler · webserver"]
-        PR[("TimescaleDB<br/>PRIMARY")]
-        RS["kr-quant · portfolio-research<br/>macro-sector-agent · momentum<br/>post-close analysis batches"]
+    subgraph S ["🖥️ simnode — reproducible"]
+        AF["quant-airflow<br/>16 DAGs"]
+        PR[("TimescaleDB PRIMARY<br/>kr_quant · gptquant")]
+        RS["kr-quant · portfolio-research<br/>macro-sector-agent · momentum"]
     end
 
-    SC -- "ticks written over the LAN<br/>reconnect + disk spool" --> PR
-    AF --> PR
-    PR -- "streaming replication" --> RP
+    KW <-->|"ticks · orderbook · orders"| SC
+    KW <-->|"quotes · orders"| DT
+    DD -->|"DART every 10 min"| SC
+    SC <-->|"writes ticks · orderbook, spooled<br/>reads universe · regime"| PR
+    DT <-->|"writes signals<br/>reads daily bars"| PR
+    AF -->|"prices · news_judgments"| PR
+    PR -->|"streaming replication"| RP
     PR --> RS
 
     classDef live fill:#B45309,stroke:#78350F,color:#FFFFFF
     classDef repro fill:#059669,stroke:#065F46,color:#FFFFFF
     classDef store fill:#2563EB,stroke:#1E40AF,color:#FFFFFF
+    classDef ext fill:#64748B,stroke:#334155,color:#FFFFFF
 
-    class SC,QB,KSE live
+    class SC,DT live
     class AF,RS repro
-    class RP,PR store
+    class RP,PR,DD store
+    class KW ext
 
     style T fill:#0F172A08,stroke:#64748B
     style S fill:#0F172A08,stroke:#64748B
 ```
 
+<sub>Every arrow into or out of a database crosses the LAN to `simnode` — nothing on `trader` reads its own replica. The replica is there to be promoted, not queried.</sub>
+
 | | **`trader`** — the live box | **`simnode`** — the research box |
 |---|---|---|
 | **Job** | Irreversible, wall-clock bound — market hours happen once | Reproducible — orchestration, batches, research |
-| **Runs** | `scalp-it` real-time tick/orderbook collection · `quantbox` · `daytrade-it` · `kiwoom-client` development, because a broker session is one-per-key and it lives here | Airflow scheduler &amp; webserver (16 DAGs) · TimescaleDB **PRIMARY** · `kr-quant`, `portfolio-research`, `macro-sector-agent`, `momentum` · every post-close aggregation batch |
-| **Shared repos** | `quant-airflow` and `kr-quant` exist here only as a **`git sparse-checkout`** — the replica's compose file, the backup script, the schema, a `.env` | The canonical full clones |
-| **TimescaleDB** | Read-only streaming replica | PRIMARY — every write lands here |
+| **Runs** | `scalp-it` tick/orderbook collection and live orders · `daytrade-it` signal daemon · `quantbox` (paused) · `kiwoom-client` development, because a broker session is one-per-key and it lives here | Airflow scheduler &amp; webserver (16 DAGs) · TimescaleDB **PRIMARY** · `kr-quant`, `portfolio-research`, `macro-sector-agent`, `momentum` · post-close research batches |
+| **Shared repos** | `quant-airflow` and `kr-quant` exist here only as a **`git sparse-checkout`** — the replica's compose file, the schema, and the `.env` files the live processes source for broker keys and the DB DSN | The canonical full clones |
+| **TimescaleDB** | Standby streaming replica | PRIMARY — every read and write, from both hosts |
+
+**Two live systems, one broker account.** They trade on different evidence and neither knows the other exists — the account is the only thing they share.
+
+```mermaid
+flowchart LR
+    subgraph SCP ["scalp-it — fully unattended, 08:55–15:20"]
+        WS["Kiwoom WebSocket<br/>ticks · orderbook"] --> DET["pair detector<br/>leader → follower"]
+        DART[("dart.db")] -->|"breaking disclosures"| DET
+        DET --> GRD["order guard<br/>size cap · price band · daily cap<br/>2-loss kill · pair_STOP"]
+    end
+
+    subgraph DTP ["daytrade-it — signals unattended, orders not"]
+        TOSS["Toss news"] --> CL["Claude<br/>facts only, no trade call"]
+        CL --> TC["rule-based price check<br/>vs. last daily close"]
+        TC -->|"both agree"| SIG[("gptquant<br/>trading_signals")]
+        SIG -. "explicit call, nothing schedules it" .-> ET["execute_trade<br/>1 share · LIMIT · price band<br/>live_STOP"]
+    end
+
+    ACC{{"Kiwoom account<br/>same app key"}}
+
+    GRD -->|"real order"| ACC
+    ET -->|"real order"| ACC
+    ACC -. "holdings → refuse to buy a held ticker" .-> GRD
+    ACC -. "holdings → refuse a second entry" .-> ET
+
+    classDef live fill:#B45309,stroke:#78350F,color:#FFFFFF
+    classDef store fill:#2563EB,stroke:#1E40AF,color:#FFFFFF
+    classDef gate fill:#B91C1C,stroke:#7F1D1D,color:#FFFFFF
+    classDef ext fill:#64748B,stroke:#334155,color:#FFFFFF
+
+    class DET,CL,TC live
+    class DART,SIG store
+    class GRD,ET gate
+    class WS,TOSS,ACC ext
+
+    style SCP fill:#0F172A08,stroke:#64748B
+    style DTP fill:#0F172A08,stroke:#64748B,stroke-dasharray:4 3
+```
+
+<sub>Red — the last check before an order. Dashed — a step a person or agent has to take.</sub>
+
+A weekday, in KST:
+
+| Time | `trader` | `simnode` |
+|---|---|---|
+| **08:30–08:45** | Morning report on yesterday · DART refresh into `dart.db` · two read-only pre-open checks, one per live system | `premarket_news_judgment` — Toss + DART → Claude → `news_judgments` |
+| **08:55** | Both launchers start — scalp-it's detector reads today's universe from the PRIMARY, daytrade-it's daemon starts polling news | |
+| **09:00–15:20** | scalp-it collects and trades · daytrade-it writes signals · DART every 10 min · tick health at 09:10 and 10:00 | `daily_news` and a collection catch-up at 10:05 · Airflow health check at 11:35 |
+| **15:20–16:10** | Both stop themselves (15:40 kill as a backstop) · same-day morning report · tick sanity · theme snapshot → PRIMARY | 16:00 `daily_collection`, `daily_earnings` · 16:05 `daily_news` again · news-judgment shadow report |
+| **16:55–19:00** | | Price adjustment · consensus · Sharadar (Tue–Sat) · `kr-quant` daily report · coverage · Google Drive backup |
 
 - **The same repo on both hosts doesn't make both real.** Config edits are made in `simnode`'s full clone and pushed; `trader` only pulls. A sparse checkout makes that hard to get backwards.
 - **Which host is PRIMARY is state, not code** — `pg_is_in_recovery()` answers it, and the answer has already flipped once. The primary started on `trader` so the collector couldn't be killed by a LAN blip; it moved to `simnode` the day the collector grew reconnect + disk spooling and proved itself in production. The demoted host was rebuilt as the replica, compose file name and all.
+- **The live box leans on the research box every morning.** Spooling protects ticks going *out*; it does nothing for inputs coming *in*. scalp-it's universe and market regime, and daytrade-it's price baseline, are all read from the PRIMARY — built from yesterday's 16:00 collection. If that read fails, scalp-it falls back to a fixed pair list and daytrade-it records no signal.
+- **Two systems, one account, no shared kill switch.** Both ask the broker for holdings before buying and refuse a ticker the account already holds, so whichever enters first owns that ticker until it's closed. But `pair_STOP` stops only scalp-it and `live_STOP` stops only daytrade-it — halting one leaves the other free to trade.
 - **Moving a batch didn't move its clock.** Cron triggers are anchored to when the data is final in the DB, not to the host, so the schedule read identically before and after the split.
+- **Backups follow the primary.** After the switch both hosts still ran the Drive backup at 19:00 into date-named files, so whichever finished later won — and that could be `trader`'s stale standby dump. It now runs on `simnode` only.
 - The one thing that had to be switched **off**: a health guard that restarts a downed DB container. Left running, it would have resurrected the demoted primary into a split brain. The script stays on disk for the day `trader` hosts the primary again.
 
 <h3><img src="https://img.shields.io/badge/%F0%9F%9B%A0%EF%B8%8F%20TECH-7C3AED?style=for-the-badge&labelColor=1E293B" height="26" alt="Tech"/></h3>
