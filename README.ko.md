@@ -92,7 +92,7 @@ flowchart TB
 | **scalp-it**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | 국내 단타 전략을 검증하는 프레임워크, 장중 실시간 틱·호가 수집기, 그리고 **실주문 루프**. 2026년 8월 말부터 감지기가 실제 주문을 낸다 — 주문 수량 하드캡, 가격 밴드, 일일 주문 한도, 연속손절 킬스위치를 건 채로. 틱은 나중에 받아올 방법이 없어서 그날 놓치면 영원히 없다. **사전등록하고 딱 한 번만 잰다.** 기각된 걸 살리려고 파라미터를 바꾸지 않는다 |
 | **quantbox**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | 바이낸스 USDT-M 선물 브레이크아웃/모멘텀 시스템 — VR 압축 스퀴즈 + MA 클러스터 스퀴즈. 실거래로 운용했고 지금은 라이브 봇을 멈춰 뒀다. 공개된 `binance-quant-engine` 은 여기서 전략만 걷어낸 것이다 |
 | **momentum**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | 미국주식 스크리너. Minervini 추세 템플릿과 VCP 패턴을 DuckDB 캐시 위에 올려 CLI 로 돌린다 |
-| **daytrade-it**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | 국내주식(코스피·코스닥) 뉴스 데이트레이딩 시스템. `trader` 의 두 번째 실매매 프로세스이고 **2026-09-14 부터 무인 실주문**을 낸다. 데몬이 토스 뉴스를 폴링하면 Claude 는 **사실만** 뽑는다 — 이 회사가 기사의 주인공인지, 새 소식인지, 어느 방향인지. 매매 판단은 시키지 않고 점수는 코드가 매긴다. 매수는 그 종목이 이미 달려 버리지 않았을 때만 낸다. scalp-it 이 따로 도달한 "추격 금지"와 같은 결론이다. 이 규칙은 **결과를 라벨로 붙인 평가셋에서 홀드아웃 구간까지 확인하고** 골랐다. 가격만 보는 ML 모델(정확도 38.5%, 기준선 38.1%)과 모델에게 주가 반응을 직접 예측시키는 방식은 둘 다 이보다 못했다. 다만 홀드아웃은 10거래일뿐이다. 주문은 1주·지정가·가격 밴드, 종목당 하루 1회, 동시 보유 최대 2종목이고, 미체결 진입은 취소하며 15:10 부터 자기가 산 주식만 되판다. 기사 전문은 그림자로 채점해 앞으로의 근거를 쌓는다. DART 중대 공시 게이트는 만들어 뒀지만 아직 주문 경로에 공시가 들어가지 않는다. `gpt-quant-v2` 를 다시 짰다 |
+| **daytrade-it**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | 국내주식(코스피·코스닥) 뉴스 데이트레이딩 시스템. `trader` 의 두 번째 실매매 프로세스이고 **2026-09-14 부터 무인 실주문**을 낸다. 데몬이 토스 뉴스를 폴링하면 Claude 는 **사실만** 뽑는다 — 이 회사가 기사의 주인공인지, 새 소식인지, 어느 방향인지. 매매 판단은 시키지 않고 점수는 코드가 매긴다. 매수는 그 종목이 이미 달려 버리지 않았을 때만 낸다. scalp-it 이 따로 도달한 "추격 금지"와 같은 결론이다. 이 규칙은 **결과를 라벨로 붙인 평가셋에서 홀드아웃 구간까지 확인하고** 골랐다. 가격만 보는 ML 모델(정확도 38.5%, 기준선 38.1%)과 모델에게 주가 반응을 직접 예측시키는 방식은 둘 다 이보다 못했다. 다만 홀드아웃은 10거래일뿐이다. 주문은 1주·지정가·가격 밴드, 종목당 하루 1회, 동시 보유 최대 2종목이고, 미체결 진입은 취소하며 15:00 부터 자기가 산 주식만 되판다. 안 팔리면 동시호가가 끝날 때까지 매번 호가를 조금씩 더 낮춘다. 기사 전문은 그림자로 채점해 앞으로의 근거를 쌓는다. scalp-it 의 DART 캐시에 최근 일주일 안의 중대 공시(상장폐지 우려·횡령·회생 등)가 있으면 진입을 거부하고, 그 캐시가 없거나 오래됐을 때도 거부한다 — 게이트가 조용히 통과시키는 일이 없게 했다. `gpt-quant-v2` 를 다시 짰다 |
 | **crypto-pair-trading**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | 암호화폐 페어 트레이딩 프레임워크의 첫 판. `quantbox` 가 여기서 나왔다 |
 | **resume-private**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | 이력서 비공개 원본 (LaTeX) |
 
@@ -159,15 +159,17 @@ flowchart LR
         DET --> GRD["주문 가드<br/>수량 캡 · 가격 밴드 · 일일 주문 한도<br/>연속손절 킬 · pair_STOP"]
     end
 
-    subgraph DTP ["daytrade-it — 완전 무인, 09:00–15:20"]
+    subgraph DTP ["daytrade-it — 완전 무인, 09:00–15:30"]
         TOSS["토스 뉴스"] --> CL["Claude<br/>사실만 추출, 매매 판단 금지"]
         CL --> TC["추격 금지 필터<br/>전일 종가 대비"]
         TC -->|"매수만"| SIG[("gptquant<br/>trading_signals")]
-        SIG --> AT["AutoTrader<br/>종목당 1회 · 동시 2종목<br/>미체결 취소 · 15:10 부터 자기 몫 매도"]
-        AT --> ET["execute_trade<br/>1주 · 지정가 · 가격 밴드<br/>live_STOP"]
+        SIG --> AT["AutoTrader<br/>종목당 1회 · 동시 2종목<br/>미체결 취소 · 15:00–15:30 자기 몫 매도"]
+        AT --> ET["execute_trade<br/>1주 · 지정가 · 가격 밴드<br/>DART 게이트 · live_STOP"]
     end
 
     ACC{{"키움 계좌<br/>같은 앱키"}}
+
+    DART -->|"최근 7일 중대 공시<br/>오래되면 거부"| ET
 
     GRD -->|"실주문"| ACC
     ET -->|"실주문"| ACC
@@ -196,14 +198,14 @@ flowchart LR
 |---|---|---|
 | **08:30–08:45** | 전일 아침 리포트 · DART 를 `dart.db` 로 갱신 · 라이브 시스템별 개장 전 점검 두 개(읽기 전용) | `premarket_news_judgment` — 토스 + DART → Claude → `news_judgments` |
 | **08:55** | 런처 둘이 뜬다 — scalp-it 감지기는 PRIMARY 에서 오늘 유니버스를 읽고, daytrade-it 은 계좌 보유를 스냅샷으로 떠 두어 자기가 산 것만 팔게 한다 | |
-| **09:00–15:20** | scalp-it 수집·매매 · daytrade-it 은 09:00:30–14:30 에 진입하고 15:10 부터 자기 몫을 정리 · 10분마다 DART · 09:10·10:00 틱 헬스체크 | 10:05 `daily_news` 와 수집 캐치업 · 11:35 Airflow 헬스체크 |
-| **15:20–16:10** | 둘 다 스스로 종료(15:40 강제 종료가 백스톱) · 당일 아침 리포트 · 틱 sanity · 테마 스냅샷 → PRIMARY | 16:00 `daily_collection`·`daily_earnings` · 16:05 `daily_news` 한 번 더 · 뉴스 판단 그림자 리포트 |
+| **09:00–15:20** | scalp-it 수집·매매 · daytrade-it 은 09:00:30–14:30 에 진입하고 15:00 부터 자기 몫을 정리 · 10분마다 DART · 09:10·10:00 틱 헬스체크 | 10:05 `daily_news` 와 수집 캐치업 · 11:35 Airflow 헬스체크 |
+| **15:20–16:10** | scalp-it 은 15:20 에 종료, daytrade-it 은 뉴스만 끊고 15:30 동시호가 끝까지 청산을 관리(15:40 강제 종료가 백스톱) · 당일 아침 리포트 · 틱 sanity · 테마 스냅샷 → PRIMARY | 16:00 `daily_collection`·`daily_earnings` · 16:05 `daily_news` 한 번 더 · 뉴스 판단 그림자 리포트 |
 | **16:55–19:00** | | 수정주가 · 컨센서스 · Sharadar(화–토) · `swing-it` 일일 리포트 · 커버리지 · 구글 드라이브 백업 |
 
 - **같은 레포가 양쪽에 있다고 양쪽 다 정본인 건 아니다.** 설정 수정은 `simnode` 의 전체 클론에서 하고 push 한다. `trader` 는 pull 만 한다 — sparse checkout 이라 거꾸로 하기가 어렵다.
 - **어느 쪽이 PRIMARY 인지는 코드가 아니라 상태다.** `pg_is_in_recovery()` 가 답하고, 그 답은 이미 한 번 뒤집혔다. 처음엔 LAN 순단에 수집기가 죽지 않도록 `trader` 가 PRIMARY 였는데, 수집기에 재연결과 디스크 스풀이 들어가 순단을 스스로 버티는 게 운영에서 확인된 날 `simnode` 로 승격했다. 강등된 쪽은 리플리카로 재구성했다 — compose 파일 이름까지 그대로 둔 채.
 - **라이브 머신은 매일 아침 리서치 머신에 기댄다.** 스풀은 나가는 틱을 지킬 뿐 들어오는 입력은 못 지킨다. scalp-it 의 유니버스와 시황, daytrade-it 의 전일 종가는 전부 PRIMARY 에서 읽는다 — 전날 16:00 수집으로 만든 값이다. 그 조회가 실패하면 scalp-it 은 고정 쌍으로 폴백하고, daytrade-it 은 진입하지 않는다.
-- **계좌는 하나인데 킬스위치는 따로다.** 둘 다 매수 직전에 브로커에서 잔고를 조회해 이미 보유한 종목은 사지 않는다. 그래서 먼저 들어간 쪽이 청산할 때까지 그 종목을 가진다. 현금도 같이 쓰기 때문에 daytrade-it 은 동시에 두 종목까지만 든다. 하지만 `pair_STOP` 은 scalp-it 만 멈추고, `live_STOP` 은 daytrade-it 의 *진입*만 멈춘다 — 청산은 계속 돈다. 열린 포지션을 버려두는 킬스위치는 안전장치가 아니기 때문이다.
+- **계좌는 하나인데 킬스위치는 따로다.** 둘 다 매수 직전에 브로커에서 잔고를 조회해 이미 보유한 종목은 사지 않는다. 그래서 먼저 들어간 쪽이 청산할 때까지 그 종목을 가진다. 현금도 같이 쓰기 때문에 daytrade-it 은 동시에 두 종목까지만 든다. daytrade-it 은 scalp-it 에도 기댄다 — 공시 게이트가 scalp-it 의 DART 캐시를 읽으므로, 그 크론이 멈추면 daytrade-it 도 매수를 멈춘다. 하지만 `pair_STOP` 은 scalp-it 만 멈추고, `live_STOP` 은 daytrade-it 의 *진입*만 멈춘다 — 청산은 계속 돈다. 열린 포지션을 버려두는 킬스위치는 안전장치가 아니기 때문이다.
 - **백테스트는 `simnode` 에서만 돈다.** `trader` 의 CPU 는 라이브 데몬 몫이라, daytrade-it 의 백테스트 진입점은 호스트 이름을 확인하고 다른 곳에서는 실행을 거부한다. `swing-it` 은 이제 `trader` 에 체크아웃조차 없다.
 - **배치를 옮겨도 시각은 안 옮겼다.** 크론 트리거는 호스트가 아니라 DB 에서 데이터가 확정되는 시점에 맞춰져 있어서, 분리 전후의 스케줄이 똑같이 읽힌다.
 - **백업은 PRIMARY 를 따라간다.** 승격 뒤에도 두 호스트가 19:00 에 날짜 이름으로 드라이브 백업을 올렸는데, 나중에 끝난 쪽이 덮어쓰니 `trader` 의 낡은 스탠바이 덤프가 그날 파일이 될 수 있었다. 지금은 `simnode` 에서만 돈다.

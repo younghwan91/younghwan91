@@ -91,7 +91,7 @@ Strategies and parameters stay closed. Only structure and discipline are written
 | **scalp-it**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | Korean intraday strategy validation framework + live tick/orderbook collection + **a live execution loop** — since late August 2026 its detector sends real orders under a hard-capped order size, a price band, a daily order cap and a consecutive-loss kill switch. Ticks cannot be backfilled, so a missed day is gone for good. **Pre-register, measure once.** No re-tuning to revive a rejected hypothesis |
 | **quantbox**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | Binance USDT-M futures breakout/momentum system — VR compression squeeze + MA cluster squeeze. Traded live; the live bot is currently paused. `binance-quant-engine` is the public extract with the strategies removed |
 | **momentum**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | US equity screener — Minervini Trend Template + VCP pattern, DuckDB-cached, CLI-driven |
-| **daytrade-it**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | Korean-equity (KOSPI/KOSDAQ) news day-trading system, the second live trader on `trader` — **unattended real orders from 2026-09-14**. A daemon polls Toss news, has Claude extract **facts only** — is the company the article's subject, is it new, which direction — never a trade call; scoring is code. A BUY needs the stock not to have already run, the same no-chase finding scalp-it reached on its own. That rule was **picked on an outcome-labeled eval with a held-out split**, over a price-only ML model (38.5% vs. a 38.1% baseline) and over asking the model to predict the reaction, which did worse — and the held-out split is only 10 trading days. Execution: 1 share, LIMIT, price band, one entry per ticker per day, at most 2 open, unfilled entries cancelled, and from 15:10 it sells back only the shares it bought. Full-text articles are scored in shadow to collect forward evidence. The DART hard-severity gate is built but not yet fed disclosures on the order path. Redeveloped from `gpt-quant-v2` |
+| **daytrade-it**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | Korean-equity (KOSPI/KOSDAQ) news day-trading system, the second live trader on `trader` — **unattended real orders from 2026-09-14**. A daemon polls Toss news, has Claude extract **facts only** — is the company the article's subject, is it new, which direction — never a trade call; scoring is code. A BUY needs the stock not to have already run, the same no-chase finding scalp-it reached on its own. That rule was **picked on an outcome-labeled eval with a held-out split**, over a price-only ML model (38.5% vs. a 38.1% baseline) and over asking the model to predict the reaction, which did worse — and the held-out split is only 10 trading days. Execution: 1 share, LIMIT, price band, one entry per ticker per day, at most 2 open, unfilled entries cancelled, and from 15:00 it sells back only the shares it bought, pricing each retry further below the bid through the closing auction. Full-text articles are scored in shadow to collect forward evidence. Entries are refused while scalp-it's DART cache shows a hard-severity filing for the ticker in the past week — delisting risk, embezzlement, rehabilitation — and also while that cache is missing or stale, so the gate can't pass trades silently. Redeveloped from `gpt-quant-v2` |
 | **crypto-pair-trading**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | First iteration of the crypto pair-trading framework — predecessor of `quantbox` |
 | **resume-private**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | Private résumé source (LaTeX) |
 
@@ -158,15 +158,17 @@ flowchart LR
         DET --> GRD["order guard<br/>size cap · price band · daily cap<br/>2-loss kill · pair_STOP"]
     end
 
-    subgraph DTP ["daytrade-it — fully unattended, 09:00–15:20"]
+    subgraph DTP ["daytrade-it — fully unattended, 09:00–15:30"]
         TOSS["Toss news"] --> CL["Claude<br/>facts only, no trade call"]
         CL --> TC["no-chase filter<br/>vs. prior close"]
         TC -->|"BUY only"| SIG[("gptquant<br/>trading_signals")]
-        SIG --> AT["AutoTrader<br/>1 entry per ticker · ≤2 open<br/>cancel unfilled · sell own shares from 15:10"]
-        AT --> ET["execute_trade<br/>1 share · LIMIT · price band<br/>live_STOP"]
+        SIG --> AT["AutoTrader<br/>1 entry per ticker · ≤2 open<br/>cancel unfilled · sell own shares 15:00–15:30"]
+        AT --> ET["execute_trade<br/>1 share · LIMIT · price band<br/>DART gate · live_STOP"]
     end
 
     ACC{{"Kiwoom account<br/>same app key"}}
+
+    DART -->|"hard filings, 7 days<br/>stale → refuse"| ET
 
     GRD -->|"real order"| ACC
     ET -->|"real order"| ACC
@@ -195,14 +197,14 @@ A weekday, in KST:
 |---|---|---|
 | **08:30–08:45** | Morning report on yesterday · DART refresh into `dart.db` · two read-only pre-open checks, one per live system | `premarket_news_judgment` — Toss + DART → Claude → `news_judgments` |
 | **08:55** | Both launchers start — scalp-it's detector reads today's universe from the PRIMARY; daytrade-it snapshots the account's holdings so it only ever sells what it bought | |
-| **09:00–15:20** | scalp-it collects and trades · daytrade-it enters 09:00:30–14:30 and flattens its own shares from 15:10 · DART every 10 min · tick health at 09:10 and 10:00 | `daily_news` and a collection catch-up at 10:05 · Airflow health check at 11:35 |
-| **15:20–16:10** | Both stop themselves (15:40 kill as a backstop) · same-day morning report · tick sanity · theme snapshot → PRIMARY | 16:00 `daily_collection`, `daily_earnings` · 16:05 `daily_news` again · news-judgment shadow report |
+| **09:00–15:20** | scalp-it collects and trades · daytrade-it enters 09:00:30–14:30 and flattens its own shares from 15:00 · DART every 10 min · tick health at 09:10 and 10:00 | `daily_news` and a collection catch-up at 10:05 · Airflow health check at 11:35 |
+| **15:20–16:10** | scalp-it stops at 15:20; daytrade-it stops reading news but manages exits through the 15:30 closing auction (15:40 kill as a backstop) · same-day morning report · tick sanity · theme snapshot → PRIMARY | 16:00 `daily_collection`, `daily_earnings` · 16:05 `daily_news` again · news-judgment shadow report |
 | **16:55–19:00** | | Price adjustment · consensus · Sharadar (Tue–Sat) · `swing-it` daily report · coverage · Google Drive backup |
 
 - **The same repo on both hosts doesn't make both real.** Config edits are made in `simnode`'s full clone and pushed; `trader` only pulls. A sparse checkout makes that hard to get backwards.
 - **Which host is PRIMARY is state, not code** — `pg_is_in_recovery()` answers it, and the answer has already flipped once. The primary started on `trader` so the collector couldn't be killed by a LAN blip; it moved to `simnode` the day the collector grew reconnect + disk spooling and proved itself in production. The demoted host was rebuilt as the replica, compose file name and all.
 - **The live box leans on the research box every morning.** Spooling protects ticks going *out*; it does nothing for inputs coming *in*. scalp-it's universe and market regime, and daytrade-it's prior close, are all read from the PRIMARY — built from yesterday's 16:00 collection. If that read fails, scalp-it falls back to a fixed pair list and daytrade-it enters nothing.
-- **Two systems, one account, no shared kill switch.** Both ask the broker for holdings before buying and refuse a ticker the account already holds, so whichever enters first owns that ticker until it's closed. They also draw on the same cash, which is why daytrade-it holds at most two positions. But `pair_STOP` stops only scalp-it, and `live_STOP` stops only daytrade-it's *entries* — its exits keep running, because a kill switch that strands an open position isn't a safety feature.
+- **Two systems, one account, no shared kill switch.** Both ask the broker for holdings before buying and refuse a ticker the account already holds, so whichever enters first owns that ticker until it's closed. They also draw on the same cash, which is why daytrade-it holds at most two positions. And daytrade-it leans on scalp-it: its disclosure gate reads scalp-it's DART cache, so if that cron stops, daytrade-it stops buying. But `pair_STOP` stops only scalp-it, and `live_STOP` stops only daytrade-it's *entries* — its exits keep running, because a kill switch that strands an open position isn't a safety feature.
 - **Backtests run on `simnode`, full stop.** `trader`'s CPU belongs to the live daemons, so daytrade-it's backtest entry points check the hostname and refuse to run anywhere else. `swing-it` isn't checked out on `trader` at all anymore.
 - **Moving a batch didn't move its clock.** Cron triggers are anchored to when the data is final in the DB, not to the host, so the schedule read identically before and after the split.
 - **Backups follow the primary.** After the switch both hosts still ran the Drive backup at 19:00 into date-named files, so whichever finished later won — and that could be `trader`'s stale standby dump. It now runs on `simnode` only.
