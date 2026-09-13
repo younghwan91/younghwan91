@@ -27,6 +27,10 @@ flowchart TB
         NW["krx-news-client"] --> AF
         F["krx-fundamentals-client"] --> AF
         K --> SC["scalp-it"]
+        KC["krx-quant-core<br/>공통 시장 규칙"] --> SC
+        KC --> KSIG
+        KC --> Q
+        K --> KC
         SC -- "틱 · 호가" --> DB
         DB -- "news_judgments<br/>그림자 채점만" --> SC
         K --> KSIG["daytrade-it<br/>뉴스 기반 데이트레이딩"]
@@ -60,7 +64,7 @@ flowchart TB
 
     class K,SH,YF,EX,F,NW,FC source
     class AF,AFU,DB,DD move
-    class Q,O,AT,CR,SC,MS,KSIG out
+    class Q,O,AT,CR,SC,MS,KSIG,KC out
 
     style KR  fill:#0F172A08,stroke:#64748B
     style US  fill:#0F172A08,stroke:#64748B
@@ -76,6 +80,7 @@ flowchart TB
 | **[quant-airflow](https://github.com/younghwan91/quant-airflow)**<br/><img src="https://img.shields.io/badge/PIPELINE-7C3AED?style=flat-square&labelColor=1E293B" alt="PIPELINE"/> | 두 주식 스택에 데이터를 대는 파이프라인 — DAG 16개. 한국 쪽은 시세·수급·실적·컨센서스·상장주식수·뉴스공시(krx-fundamentals-client·krx-news-client 경유)를 DART·키움·KRX·네이버·토스에서 모아 TimescaleDB 에 쌓는다. **상장폐지 종목까지 되살려 담기 때문에** 이 데이터로 만든 백테스트는 생존편향에 빠지지 않는다. 그 뉴스·공시 스트림을 LLM이 구조화 판단(이벤트 유형·감성·재탕 여부)으로 바꿔 `news_judgments` 에 남긴다 — scalp-it 은 이걸 그림자로만 채점하고, 주문에는 닿지 않는다. 미국 쪽은 Sharadar 스냅샷을 매일 통째로 받아 DuckDB 스토어를 새로 만든 뒤 한 번에 갈아끼운다 |
 | **[krx-fundamentals-client](https://github.com/younghwan91/krx-fundamentals-client)**<br/><img src="https://img.shields.io/badge/DATA%20SOURCE-2563EB?style=flat-square&labelColor=1E293B" alt="DATA SOURCE"/> | 국내 기업 펀더멘탈 Python 클라이언트 라이브러리. 재무제표(최대 100종목씩 배치 조회)와 투자지표, 배당, 종목 스크리닝을 DART·KRX·네이버에서 모아 정규화한다. 상시 서버 없이 호출 시점에 소스에 직접 요청한다 · quant-airflow 의 실적·주식수·컨센서스 DAG 가 이걸 쓴다 |
 | **[krx-news-client](https://github.com/younghwan91/krx-news-client)**<br/><img src="https://img.shields.io/badge/DATA%20SOURCE-2563EB?style=flat-square&labelColor=1E293B" alt="DATA SOURCE"/> | 한국 주식 뉴스와 공시를 모아 주는 Python 클라이언트 라이브러리 — DART 공시 + 토스증권 뉴스. 매체마다 같은 사건을 조금씩 다르게 쓰는데, 그걸 한 스키마로 눕혀서 내준다 · quant-airflow 의 `daily_news` DAG 가 이걸 쓴다 · **`pip install krx-news-client`** <a href="https://pypi.org/project/krx-news-client/"><img src="https://img.shields.io/pypi/dm/krx-news-client?style=flat-square&label=PyPI&color=2563EB&labelColor=1E293B" alt="PyPI downloads"/></a> |
+| **[krx-quant-core](https://github.com/younghwan91/krx-quant-core)**<br/><img src="https://img.shields.io/badge/SHARED%20CORE-0F766E?style=flat-square&labelColor=1E293B" alt="SHARED CORE"/> | 한국 주식 시스템들이 시장 규칙을 한 군데서 맞추는 공통 코어 — KRX 호가단위, 상·하한가(실제 일봉으로 대조해 보니 둘은 **대칭이 아니었다**), 세션 시각, 비용 상수 하나 대신 **시행일별** 증권거래세 스케줄, 키움 주문 가드, DART 중대공시 분류, 킬스위치, 지정가 체결 규칙, 검증 통계(Deflated Sharpe·purged walk-forward·부트스트랩). 전략은 없다. scalp-it·daytrade-it·swing-it 이 각자 사본을 들고 있던 걸 이걸 import 하도록 바꿨다 — 라이브 트레이더가 갈아타기 전에 함수마다 **수치 동일**하게 옮기고 원래 코드와 대조했다. PyPI 릴리스 전까지는 git 태그로 고정한다 |
 | **[fin-checkup](https://github.com/younghwan91/fin-checkup)**<br/><img src="https://img.shields.io/badge/TOOL-0891B2?style=flat-square&labelColor=1E293B" alt="TOOL"/> | 관심 종목에 유상증자·전환사채·감사의견·상장폐지 같은 위험 공시가 뜨면 텔레그램으로 알린다 — 수집·분류는 실데이터로 확인했지만 텔레그램 실발송은 아직 해 보지 않았다. 재무 17개 지표는 작년 값, 업종 중앙값, 동종업계 백분위와 나란히 놓아 신호등으로 보여준다. DART 와 SEC 양쪽을 본다. **재무 수치와 사실만 전하고 종목 추천은 하지 않는다** |
 | **[swing-it](https://github.com/younghwan91/swing-it)**<br/><img src="https://img.shields.io/badge/RESEARCH-059669?style=flat-square&labelColor=1E293B" alt="RESEARCH"/> | 코스피·코스닥 스윙 리서치. 두 축을 일부러 떼어 뒀다. **관측** 쪽은 섹터별로 돈이 어디로 들고 났는지 5~120거래일 구간으로 보여주는 터미널 화면 `sw-flow` 와, 그 밑의 주체×섹터 원장을 그대로 펼친 `sw-ledger` 다. 잰 값만 보여주고 예측은 하지 않는다. **심사** 쪽은 알파를 개별 트레이드 분포로 판정한다. walk-forward, 랜덤 음성대조, purged CV, Deflated Sharpe, 생존편향 보정 유니버스를 **CI 가 전부 검사하므로 빠뜨릴 수가 없다**. **여기서 나오는 건 대개 기각이고, 그게 이 저장소의 산출물이다.** 아무 신호도 없는 난수가 “6폴드 중 5폴드 양수”를 46% 확률로 통과하니, 판별 기준은 폴드 개수가 아니라 자기 자신의 무작위 버전을 이기느냐다. 알파 가설 6건 중 5건을 기각했고 통과한 건 PEAD 하나다. 옛 이름 `kr-quant` |
 | **[portfolio-research](https://github.com/younghwan91/portfolio-research)**<br/><img src="https://img.shields.io/badge/RESEARCH-059669?style=flat-square&labelColor=1E293B" alt="RESEARCH"/> | 미국주식 팩터 엔진. 시점이 어긋나지 않고 생존편향을 보정한 데이터 위에서만 walk-forward 를 돌리고, 그 결과를 **Deflated Sharpe 와 PBO** 로 거른다. ETF 전술배분도 같이 검증한다. **통과한 것만 싣지는 않는다.** 사전등록한 TAA 9건은 전부 PBO 관문을 못 넘었고, 표제로 쓰던 숫자 하나는 스스로 철회했다 · [writeup](https://younghwan91.github.io/portfolio-research/) |
@@ -206,7 +211,8 @@ flowchart LR
 - **어느 쪽이 PRIMARY 인지는 코드가 아니라 상태다.** `pg_is_in_recovery()` 가 답하고, 그 답은 이미 한 번 뒤집혔다. 처음엔 LAN 순단에 수집기가 죽지 않도록 `trader` 가 PRIMARY 였는데, 수집기에 재연결과 디스크 스풀이 들어가 순단을 스스로 버티는 게 운영에서 확인된 날 `simnode` 로 승격했다. 강등된 쪽은 리플리카로 재구성했다 — compose 파일 이름까지 그대로 둔 채.
 - **라이브 머신은 매일 아침 리서치 머신에 기댄다.** 스풀은 나가는 틱을 지킬 뿐 들어오는 입력은 못 지킨다. scalp-it 의 유니버스와 시황, daytrade-it 의 전일 종가는 전부 PRIMARY 에서 읽는다 — 전날 16:00 수집으로 만든 값이다. 그 조회가 실패하면 scalp-it 은 고정 쌍으로 폴백하고, daytrade-it 은 진입하지 않는다.
 - **계좌는 하나인데 킬스위치는 따로다.** 둘 다 매수 직전에 브로커에서 잔고를 조회해 이미 보유한 종목은 사지 않는다. 그래서 먼저 들어간 쪽이 청산할 때까지 그 종목을 가진다. 현금도 같이 쓰기 때문에 daytrade-it 은 동시에 두 종목까지만 든다. daytrade-it 은 scalp-it 에도 기댄다 — 공시 게이트가 scalp-it 의 DART 캐시를 읽으므로, 그 크론이 멈추면 daytrade-it 도 매수를 멈춘다. 하지만 `pair_STOP` 은 scalp-it 만 멈추고, `live_STOP` 은 daytrade-it 의 *진입*만 멈춘다 — 청산은 계속 돈다. 열린 포지션을 버려두는 킬스위치는 안전장치가 아니기 때문이다.
-- **백테스트는 `simnode` 에서만 돈다.** `trader` 의 CPU 는 라이브 데몬 몫이라, daytrade-it 의 백테스트 진입점은 호스트 이름을 확인하고 다른 곳에서는 실행을 거부한다. `swing-it` 은 이제 `trader` 에 체크아웃조차 없다.
+- **백테스트는 `simnode` 에서만 돈다.** `trader` 의 CPU 는 라이브 데몬 몫이라, 두 라이브 시스템의 백테스트 진입점은 호스트 이름을 확인하고 다른 곳에서는 실행을 거부한다 — 레포마다 사본을 두지 않고 `krx-quant-core` 의 가드 하나를 쓴다. `swing-it` 은 이제 `trader` 에 체크아웃조차 없다.
+- **시스템은 셋이어도 시장 규칙은 하나다.** 호가단위 표, 가격제한폭, 주문 가드 판정, 공시 분류가 레포마다 따로 있었고 이미 어긋나 있었다 — 같은 `normalize_code` 가 두 군데 복붙돼 있었고, 비용 가정은 `0.0023`·`0.0034`·`0.0064` 로 흩어진 채 거래세가 4년 동안 네 번 바뀌었다는 개념조차 없었다. 이제는 전부 `krx-quant-core` 에서 온다. 라이브 트레이더를 옮기는 건 돈을 옮기듯 했다 — 무작위 입력으로 옛 코드와 나란히 대조하고(주문 수만 건, DART 캐시의 공시 전부), 새 코드가 똑같이 나올 때까지 운영 체크아웃은 건드리지 않았고, 옮긴 뒤 개장 전 점검 두 개를 끝까지 돌렸다.
 - **배치를 옮겨도 시각은 안 옮겼다.** 크론 트리거는 호스트가 아니라 DB 에서 데이터가 확정되는 시점에 맞춰져 있어서, 분리 전후의 스케줄이 똑같이 읽힌다.
 - **백업은 PRIMARY 를 따라간다.** 승격 뒤에도 두 호스트가 19:00 에 날짜 이름으로 드라이브 백업을 올렸는데, 나중에 끝난 쪽이 덮어쓰니 `trader` 의 낡은 스탠바이 덤프가 그날 파일이 될 수 있었다. 지금은 `simnode` 에서만 돈다.
 - 반대로 **꺼야 했던 것** 하나 — 내려간 DB 컨테이너를 되살리는 헬스 가드다. 그대로 뒀으면 강등된 옛 PRIMARY 를 깨워 split-brain 을 만들었을 것이다. 스크립트 파일은 `trader` 가 다시 PRIMARY 를 맡을 날을 위해 디스크에 남겨뒀다.
