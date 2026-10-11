@@ -16,33 +16,22 @@
 
 <h3><img src="https://img.shields.io/badge/%F0%9F%94%AD%20%EC%98%A4%ED%94%88%EC%86%8C%EC%8A%A4-059669?style=for-the-badge&labelColor=1E293B" height="26" alt="오픈소스"/></h3>
 
-세 스택이 같은 뼈대를 쓴다. **수집하고, 저장하고, 그 위에서만 검증한다.**
-두 주식 시장은 Airflow 하나를 나눠 쓰고, 단독으로 도는 서비스들은 파이프라인 바깥에 있다.
+세 스택이 같은 뼈대를 쓴다. **수집하고, 저장하고, 그 위에서만 검증한다.** 한국 주식 쪽이 가장 두텁다 — 클라이언트 라이브러리들이 Airflow 하나를 거쳐 TimescaleDB 에 쌓이고, 공통 코어가 시장 규칙을 하나로 맞추고, 리서치·매매 레포는 거기서 읽는다.
 
 ```mermaid
 flowchart TB
     subgraph KR ["🇰🇷 한국 주식"]
         direction LR
-        K["kiwoom-client"] --> AF["quant-airflow<br/>DART · KRX · 네이버 · 토스"] --> DB[("TimescaleDB<br/>상장폐지 포함")] --> Q["swing-it"]
-        NW["krx-news-client"] --> AF
-        F["krx-fundamentals-client"] --> AF
-        K --> SC["scalp-it"]
-        KC["krx-quant-core<br/>공통 시장 규칙"] --> SC
-        KC --> KSIG
-        KC --> Q
-        K --> KC
-        SC -- "틱 · 호가" --> DB
-        DB -- "news_judgments<br/>그림자 채점만" --> SC
-        K --> KSIG["daytrade-it<br/>뉴스 기반 데이트레이딩"]
-        NW -- "토스 뉴스 직접" --> KSIG
-        DB -- "일봉, 읽기전용" --> KSIG
+        SRC["kiwoom-client<br/>krx-news-client<br/>krx-fundamentals-client"] --> AF["quant-airflow"] --> DB[("TimescaleDB<br/>상장폐지 포함")]
+        DB --> SW["swing-it"]
+        DB --> DT["daytrade-it"]
+        DB --> SC["scalp-it"]
+        KC["krx-quant-core<br/>공통 시장 규칙"] --> SW & DT & SC
     end
 
     subgraph US ["🇺🇸 미국 주식"]
         direction LR
-        SH["Sharadar"] --> AFU["quant-airflow<br/>일괄 스냅샷 재생성<br/>09-12 부터 중단"] --> DD[("DuckDB<br/>시점 정합")] --> O["portfolio-research"]
-        SH --> MS["macro-sector-agent<br/>자체 PIT DuckDB"]
-        YF["yfinance"] --> AT["automated-stock-trading-systems"]
+        SH["Sharadar<br/>09-10 에서 멈춤"] --> DD[("DuckDB<br/>시점 정합")] --> PR["portfolio-research<br/>macro-sector-agent"]
     end
 
     subgraph CX ["🪙 암호화폐"]
@@ -50,43 +39,38 @@ flowchart TB
         EX["거래소 API"] --> CR["binance-quant-engine"]
     end
 
-    subgraph SVC ["단독 서비스 · 도구"]
-        direction TB
-        FC["fin-checkup"]
-    end
+    FC["fin-checkup<br/>DART · SEC EDGAR"]
 
-    %% 세로 정렬용 — `~~~` 는 그 자체로 보이지 않는 링크다(linkStyle 불필요).
-    KR ~~~ US ~~~ CX ~~~ SVC
+    KR ~~~ US ~~~ CX ~~~ FC
 
     classDef source fill:#2563EB,stroke:#1E40AF,color:#FFFFFF
     classDef move   fill:#B45309,stroke:#78350F,color:#FFFFFF
     classDef out    fill:#059669,stroke:#065F46,color:#FFFFFF
 
-    class K,SH,YF,EX,F,NW,FC source
-    class AF,AFU,DB,DD move
-    class Q,O,AT,CR,SC,MS,KSIG,KC out
+    class SRC,SH,EX,FC source
+    class AF,DB,DD move
+    class SW,DT,SC,KC,PR,CR out
 
-    style KR  fill:#0F172A08,stroke:#64748B
-    style US  fill:#0F172A08,stroke:#64748B
-    style CX  fill:#0F172A08,stroke:#64748B
-    style SVC fill:#0F172A08,stroke:#64748B,stroke-dasharray:4 3
+    style KR fill:#0F172A08,stroke:#64748B
+    style US fill:#0F172A08,stroke:#64748B
+    style CX fill:#0F172A08,stroke:#64748B
 ```
 
-<sub>파랑은 데이터 원천과 단독 서비스, 앰버는 수집·저장, 초록은 리서치·엔진이다. 점선은 파이프라인 바깥을 뜻한다.</sub>
+<sub>파랑은 데이터 원천과 단독 도구, 앰버는 수집·저장, 초록은 리서치·엔진이다. `scalp-it` 과 `daytrade-it` 은 비공개다.</sub>
 
 | 프로젝트 | 무엇인가 |
 |---|---|
-| **[kiwoom-client](https://github.com/younghwan91/kiwoom-client)**<br/><img src="https://img.shields.io/badge/DATA%20SOURCE-2563EB?style=flat-square&labelColor=1E293B" alt="DATA SOURCE"/> | 키움증권 REST API 를 파이썬으로 감싼 라이브러리. 국내주식 엔드포인트를 빠짐없이 덮고 실시간 WebSocket 도 받는다. sync 와 async 를 모두 지원하고 토큰은 알아서 갱신한다. 예전 OpenAPI+ 처럼 32bit 윈도우에 묶이지 않아 리눅스 서버에서 그대로 돈다. REST 엔드포인트 182개와 `condition_search` 를 통째로 노출하는 **MCP 서버**도 들어 있어 AI 에이전트가 바로 도구로 쓸 수 있다 — 실주문은 옵트인일 때만 · **`pip install kiwoom-client`** <a href="https://pypi.org/project/kiwoom-client/"><img src="https://img.shields.io/pypi/dm/kiwoom-client?style=flat-square&label=PyPI&color=2563EB&labelColor=1E293B" alt="PyPI downloads"/></a> |
-| **[quant-airflow](https://github.com/younghwan91/quant-airflow)**<br/><img src="https://img.shields.io/badge/PIPELINE-7C3AED?style=flat-square&labelColor=1E293B" alt="PIPELINE"/> | 두 주식 스택에 데이터를 대는 파이프라인 — DAG 16개. 한국 쪽은 시세·수급·실적·컨센서스·상장주식수·뉴스공시(krx-fundamentals-client·krx-news-client 경유)를 DART·키움·KRX·네이버·토스에서 모아 TimescaleDB 에 쌓는다. **상장폐지 종목까지 되살려 담기 때문에** 이 데이터로 만든 백테스트는 생존편향에 빠지지 않는다. 그 뉴스·공시 스트림을 LLM이 구조화 판단(이벤트 유형·감성·재탕 여부)으로 바꿔 `news_judgments` 에 남긴다 — scalp-it 은 이걸 그림자로만 채점하고, 주문에는 닿지 않는다. 미국 쪽은 Sharadar 스냅샷을 매일 통째로 받아 DuckDB 스토어를 새로 만든 뒤 한 번에 갈아끼운다 — 다만 **지금은 멈춰 있다**. 구독을 해지해 2026-09-12 부터 테이블이 전부 403 을 돌려주므로 DAG 를 UI 가 아니라 코드에서 껐고, 미국 스토어는 09-11 빌드에서 멈춰 있다 |
-| **[krx-fundamentals-client](https://github.com/younghwan91/krx-fundamentals-client)**<br/><img src="https://img.shields.io/badge/DATA%20SOURCE-2563EB?style=flat-square&labelColor=1E293B" alt="DATA SOURCE"/> | 국내 기업 펀더멘탈 Python 클라이언트 라이브러리. 재무제표(최대 100종목씩 배치 조회)와 투자지표, 배당, 종목 스크리닝을 DART·KRX·네이버에서 모아 정규화한다. 상시 서버 없이 호출 시점에 소스에 직접 요청한다 · quant-airflow 의 실적·주식수·컨센서스 DAG 가 이걸 쓴다 |
-| **[krx-news-client](https://github.com/younghwan91/krx-news-client)**<br/><img src="https://img.shields.io/badge/DATA%20SOURCE-2563EB?style=flat-square&labelColor=1E293B" alt="DATA SOURCE"/> | 한국 주식 뉴스와 공시를 모아 주는 Python 클라이언트 라이브러리 — DART 공시 + 토스증권 뉴스. 매체마다 같은 사건을 조금씩 다르게 쓰는데, 그걸 한 스키마로 눕혀서 내준다 · 0.4.0 에서 토스 기사 본문·종목별 뉴스 이력, DART 원문, 기간 분할 조회가 들어갔다 · quant-airflow 의 `daily_news` DAG 가 이걸 쓴다 · **`pip install krx-news-client`** <a href="https://pypi.org/project/krx-news-client/"><img src="https://img.shields.io/pypi/dm/krx-news-client?style=flat-square&label=PyPI&color=2563EB&labelColor=1E293B" alt="PyPI downloads"/></a> |
-| **[krx-quant-core](https://github.com/younghwan91/krx-quant-core)**<br/><img src="https://img.shields.io/badge/SHARED%20CORE-0F766E?style=flat-square&labelColor=1E293B" alt="SHARED CORE"/> | 한국 주식 시스템들이 시장 규칙을 한 군데서 맞추는 공통 코어 — KRX 호가단위, 상·하한가(실제 일봉으로 대조해 보니 둘은 **대칭이 아니었다**), 세션 시각, 비용 상수 하나 대신 **시행일별** 증권거래세 스케줄, 키움 주문 가드, DART 중대공시 분류, 킬스위치, 지정가 체결 규칙, 검증 통계(Deflated Sharpe·purged walk-forward·부트스트랩), 지정가 **대기열 위치** 모델까지 갖춘 초 격자 틱·호가 리플레이(옮겨 온 scalp-it 코드와 비트 단위 동일, numba 는 선택), 그리고 실행 기록 — `start_run` 이 백테스트를 전부 남기고 **OOS 구간을 하드 잠금**해 사전등록한 검증의 최종 실행이 딱 한 번만 되게 한다. 전략은 없다. scalp-it·daytrade-it·swing-it 이 각자 사본을 들고 있던 걸 이걸 import 하도록 바꿨다 — 라이브 트레이더가 갈아타기 전에 함수마다 **수치 동일**하게 옮기고 원래 코드와 대조했다. PyPI 에 올라가 있고 swing-it·scalp-it 은 `0.4.1` 로 고정, daytrade-it 은 아직 처음 쓰던 git 태그에 있다 |
-| **[fin-checkup](https://github.com/younghwan91/fin-checkup)**<br/><img src="https://img.shields.io/badge/TOOL-0891B2?style=flat-square&labelColor=1E293B" alt="TOOL"/> | 관심 종목에 유상증자·전환사채·감사의견·상장폐지 같은 위험 공시가 뜨면 텔레그램으로 알린다 — 수집·분류는 실데이터로 확인했지만 텔레그램 실발송은 아직 해 보지 않았다. 재무 17개 지표는 작년 값, 업종 중앙값, 동종업계 백분위와 나란히 놓아 신호등으로 보여준다. DART 와 SEC 양쪽을 본다. **재무 수치와 사실만 전하고 종목 추천은 하지 않는다** |
-| **[swing-it](https://github.com/younghwan91/swing-it)**<br/><img src="https://img.shields.io/badge/RESEARCH-059669?style=flat-square&labelColor=1E293B" alt="RESEARCH"/> | 코스피·코스닥 스윙 리서치. 두 축을 일부러 떼어 뒀다. **관측** 쪽은 섹터별로 돈이 어디로 들고 났는지 5~120거래일 구간으로 보여주는 터미널 화면 `sw-flow` 와, 그 밑의 주체×섹터 원장을 그대로 펼친 `sw-ledger` 다. 잰 값만 보여주고 예측은 하지 않는다. **심사** 쪽은 알파를 개별 트레이드 분포로 판정한다. walk-forward, 랜덤 음성대조, purged CV, Deflated Sharpe, 생존편향 보정 유니버스를 **CI 가 전부 검사하므로 빠뜨릴 수가 없다**. **여기서 나오는 건 대개 기각이고, 그게 이 저장소의 산출물이다.** 아무 신호도 없는 난수가 “6폴드 중 5폴드 양수”를 46% 확률로 통과하니, 판별 기준은 폴드 개수가 아니라 자기 자신의 무작위 버전을 이기느냐다. 알파 가설 6건 중 5건을 기각했고 통과한 건 PEAD 하나다. 옛 이름 `kr-quant` |
-| **[portfolio-research](https://github.com/younghwan91/portfolio-research)**<br/><img src="https://img.shields.io/badge/RESEARCH-059669?style=flat-square&labelColor=1E293B" alt="RESEARCH"/> | 미국주식 팩터 엔진. 시점이 어긋나지 않고 생존편향을 보정한 데이터 위에서만 walk-forward 를 돌리고, 그 결과를 **Deflated Sharpe 와 PBO** 로 거른다. ETF 전술배분도 같이 검증한다. **통과한 것만 싣지는 않는다.** 사전등록한 TAA 9건은 전부 PBO 관문을 못 넘었고, 표제로 쓰던 숫자 하나는 스스로 철회했다 · [writeup](https://younghwan91.github.io/portfolio-research/) |
-| **[macro-sector-agent](https://github.com/younghwan91/macro-sector-agent)**<br/><img src="https://img.shields.io/badge/RESEARCH-059669?style=flat-square&labelColor=1E293B" alt="RESEARCH"/> | 하향식으로 미국 산업 테마를 찾는 리서치 파이프라인 — 자체 Sharadar 기반 시점정합 DuckDB 위에서 돈다. “지금 뭘 사야 하나”가 아니라 “**지금 어느 산업이 잊혔나**”를 먼저 묻는다. 표준 섹터 분류로는 안 보이는 해상도로 시장을 쪼갠다. 사이클 저점인지 그냥 죽어가는 산업인지는 LLM 판별기가 증거를 놓고 따지되, **파이프라인의 좁은 허리에만 두고** 위아래는 전부 결정론으로 짰다. **기계는 종목을 고르지 않고 빼기만 한다** — 전략 파라미터는 저장소에 없다 |
-| **[binance-quant-engine](https://github.com/younghwan91/binance-quant-engine)**<br/><img src="https://img.shields.io/badge/CRYPTO%20ENGINE-EA580C?style=flat-square&labelColor=1E293B" alt="CRYPTO ENGINE"/> | 전략을 가리지 않는 바이낸스 USDT-M 선물 백테스트·실행 엔진. 전략이 받는 배열에 미래 봉이 애초에 안 들어가고, 같은 전략 객체가 백테스트와 실거래를 그대로 탄다. MCP 서버도 옵션으로 들어 있다. 청산 주문은 거래소에 미리 걸어 두므로 봇이 죽어도 남는다 |
-| **[automated-stock-trading-systems](https://github.com/younghwan91/automated-stock-trading-systems)**<br/><img src="https://img.shields.io/badge/RESEARCH-059669?style=flat-square&labelColor=1E293B" alt="RESEARCH"/> | Bensdorp 의 비상관 트레이딩 시스템 7개를 교육용으로 다시 구현한 백테스터. 일곱을 함께 돌리면 상관이 낮아진다는 주장을 그대로 확인해 본다 |
+| **[kiwoom-client](https://github.com/younghwan91/kiwoom-client)**<br/><img src="https://img.shields.io/badge/DATA%20SOURCE-2563EB?style=flat-square&labelColor=1E293B" alt="DATA SOURCE"/> | 키움증권 REST API 를 파이썬으로 감싼 라이브러리. 국내주식 엔드포인트를 빠짐없이 덮고 실시간 WebSocket 도 받는다. sync·async 양쪽, 토큰 자동 갱신. 같은 API 를 도구로 노출하는 **MCP 서버**도 들어 있어 AI 에이전트가 바로 쓴다 — 실주문은 옵트인일 때만 · **`pip install kiwoom-client`** <a href="https://pypi.org/project/kiwoom-client/"><img src="https://img.shields.io/pypi/dm/kiwoom-client?style=flat-square&label=PyPI&color=2563EB&labelColor=1E293B" alt="PyPI downloads"/></a> |
+| **[krx-news-client](https://github.com/younghwan91/krx-news-client)**<br/><img src="https://img.shields.io/badge/DATA%20SOURCE-2563EB?style=flat-square&labelColor=1E293B" alt="DATA SOURCE"/> | 한국 주식 뉴스와 공시를 한 스키마로 내주는 라이브러리 — DART 공시와 토스증권 뉴스, 기사 본문과 종목별 이력까지 · **`pip install krx-news-client`** <a href="https://pypi.org/project/krx-news-client/"><img src="https://img.shields.io/pypi/dm/krx-news-client?style=flat-square&label=PyPI&color=2563EB&labelColor=1E293B" alt="PyPI downloads"/></a> |
+| **[krx-fundamentals-client](https://github.com/younghwan91/krx-fundamentals-client)**<br/><img src="https://img.shields.io/badge/DATA%20SOURCE-2563EB?style=flat-square&labelColor=1E293B" alt="DATA SOURCE"/> | 국내 기업 펀더멘탈 — 재무제표·투자지표·배당·종목 스크리닝을 DART·KRX·네이버에서 모아 정규화한다. 상시 서버 없음 |
+| **[quant-airflow](https://github.com/younghwan91/quant-airflow)**<br/><img src="https://img.shields.io/badge/PIPELINE-7C3AED?style=flat-square&labelColor=1E293B" alt="PIPELINE"/> | 두 주식 스택에 데이터를 대는 파이프라인 하나. 한국 쪽은 시세·수급·실적·컨센서스·상장주식수·뉴스공시를 TimescaleDB 에 쌓는다. **상장폐지 종목까지 되살려 담아** 이 데이터로 만든 백테스트는 생존편향에 빠지지 않고, 새벽에 전날 16:00 의 잠정치를 확정치로 다시 받는다. 뉴스 스트림에 대한 LLM 판정은 자기 원장에 남는다 — 그림자로만 채점하고 주문 근처엔 가지 않는다. 미국 쪽 Sharadar 스냅샷 재구축은 구독이 끝나 **멈춰 있고**, 스토어는 2026-09-10 빌드에서 고정이다 |
+| **[krx-quant-core](https://github.com/younghwan91/krx-quant-core)**<br/><img src="https://img.shields.io/badge/SHARED%20CORE-0F766E?style=flat-square&labelColor=1E293B" alt="SHARED CORE"/> | 한국 주식 시스템들이 시장 규칙을 한 군데서 맞추는 공통 코어 — 호가단위, 상·하한가(실제 일봉으로 대조하니 둘은 **대칭이 아니었다**), 세션 시각, 상수 하나 대신 **시행일별** 증권거래세 스케줄, 주문 가드, DART 중대공시 분류, 킬스위치, 검증 통계(Deflated Sharpe·purged walk-forward·매칭 대조군·선택편향 곡선). 0.7 에서 공용 데이터 층과 numba 커널, 그리고 실매매 코드를 그대로 돌려 지난 날을 재생하는 리플레이 엔진이 들어왔다. 실행 원장이 **표본 외 구간을 하드 잠가** 사전등록한 검정은 딱 한 번만 최종이다. 전략은 없다. 소비 레포 셋이 같은 버전을 핀하고, 모든 함수는 숫자가 똑같이 나오는 걸 대조한 뒤에야 라이브 트레이더가 갈아탔다 |
+| **[fin-checkup](https://github.com/younghwan91/fin-checkup)**<br/><img src="https://img.shields.io/badge/TOOL-0891B2?style=flat-square&labelColor=1E293B" alt="TOOL"/> | 관심 종목에 유상증자·전환사채·감사의견·상장폐지 같은 위험 공시가 뜨면 텔레그램으로 알리고, **DART 와 SEC EDGAR** 의 재무를 작년 값·업종 중앙값·동종업계 백분위와 나란히 신호등으로 보여준다. 수집·분류는 실데이터로 확인했지만 텔레그램 실발송은 아직이다. **수치와 사실만 전하고 종목 추천은 하지 않는다** |
+| **[swing-it](https://github.com/younghwan91/swing-it)**<br/><img src="https://img.shields.io/badge/RESEARCH-059669?style=flat-square&labelColor=1E293B" alt="RESEARCH"/> | 코스피·코스닥 스윙 리서치, 두 축을 일부러 떼어 뒀다. **관측**은 섹터별로 돈이 어디로 들고 났는지 보여주는 터미널 화면이고 잰 값만 보여준다. **심사**는 알파 가설을 개별 트레이드 분포로 판정한다 — walk-forward, 랜덤 음성대조, purged CV, Deflated Sharpe 를 **CI 가드레일로 강제**한다. 순수 노이즈도 "6폴드 중 5폴드 양수"를 절반 가까이 통과하므로, 기준은 전략이 자기 자신의 랜덤 버전을 이기는가다. **기각이 산출물이다**: 통과한 가설은 PEAD 하나뿐이다 |
+| **[portfolio-research](https://github.com/younghwan91/portfolio-research)**<br/><img src="https://img.shields.io/badge/RESEARCH-059669?style=flat-square&labelColor=1E293B" alt="RESEARCH"/> | 미국주식 팩터 엔진. 시점이 어긋나지 않고 생존편향을 보정한 데이터 위에서만 walk-forward 를 돌리고 **Deflated Sharpe 와 PBO** 로 거른다. ETF 전술배분도 같이 검증한다. **통과한 것만 싣지 않는다** — 사전등록한 TAA 설정은 전부 PBO 관문을 못 넘었고, 표제 숫자 하나는 스스로 철회했다 · [writeup](https://younghwan91.github.io/portfolio-research/) |
+| **[macro-sector-agent](https://github.com/younghwan91/macro-sector-agent)**<br/><img src="https://img.shields.io/badge/RESEARCH-059669?style=flat-square&labelColor=1E293B" alt="RESEARCH"/> | 하향식 미국 산업 사이클 리서치 — "지금 뭘 사야 하나"가 아니라 "**지금 어느 산업이 잊혔나**"를 묻는다. 사이클 저점인지 죽어가는 산업인지는 LLM 판별기가 증거를 놓고 따지되 파이프라인의 좁은 허리에만 두고, 그 위아래는 전부 결정론적이다. **기계는 고르지 않는다 — 제외만 한다** |
+| **[binance-quant-engine](https://github.com/younghwan91/binance-quant-engine)**<br/><img src="https://img.shields.io/badge/CRYPTO%20ENGINE-EA580C?style=flat-square&labelColor=1E293B" alt="CRYPTO ENGINE"/> | 전략을 가리지 않는 바이낸스 USDT-M 선물 백테스트·실행 엔진 — 룩어헤드 0, 백테스트↔실거래 일체화, 청산은 거래소 측 알고 주문으로 미리 걸어 둔다. MCP 서버는 옵션 |
+| **[automated-stock-trading-systems](https://github.com/younghwan91/automated-stock-trading-systems)**<br/><img src="https://img.shields.io/badge/RESEARCH-059669?style=flat-square&labelColor=1E293B" alt="RESEARCH"/> | Bensdorp 의 비상관 트레이딩 시스템 7개를 교육용으로 다시 구현한 백테스터 |
 
 <h3><img src="https://img.shields.io/badge/%F0%9F%94%92%20%EB%B9%84%EA%B3%B5%EA%B0%9C-64748B?style=for-the-badge&labelColor=1E293B" height="26" alt="비공개"/></h3>
 
@@ -94,130 +78,44 @@ flowchart TB
 
 | 프로젝트 | 무엇인가 |
 |---|---|
-| **scalp-it**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | 국내 단타 전략을 검증하는 프레임워크, 장중 실시간 틱·호가 수집기, 그리고 **실주문 루프**. 2026년 8월 말부터 감지기가 실제 주문을 낸다 — 주문 수량 하드캡, 가격 밴드, 일일 주문 한도, 연속손절 킬스위치를 건 채로. 틱은 나중에 받아올 방법이 없어서 그날 놓치면 영원히 없다. **사전등록하고 딱 한 번만 잰다.** 기각된 걸 살리려고 파라미터를 바꾸지 않는다 — 사전등록 문서는 해시로 남기고 OOS 구간은 `krx-quant-core` 로 하드 잠가서 최종 실행은 한 번뿐이다. 가설은 대부분 거기서 죽는다: 호가·체결 흐름 스캘핑, 호가 시뮬레이터 위의 LightGBM·Double DQN, 대기열을 반영한 지정가 진입 엔진이 모두 왕복 비용 ~23bp 앞에서 순손실로 끝났다 |
-| **quantbox**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | 바이낸스 USDT-M 선물 브레이크아웃/모멘텀 시스템 — VR 압축 스퀴즈 + MA 클러스터 스퀴즈. 실거래로 운용했고 지금은 라이브 봇을 멈춰 뒀다. 공개된 `binance-quant-engine` 은 여기서 전략만 걷어낸 것이다 |
+| **scalp-it**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | 국내 단타 검증 프레임워크 + 장중 틱·호가 실시간 수집 + **실주문 루프**. 2026년 8월 말부터 감지기가 1주 실주문을 낸다 — 수량 하드캡, 가격 밴드, 일일 주문 한도, 연속손절 킬스위치를 건 채로. 틱은 소급 수집이 안 되니 놓친 날은 영원히 없다. **사전등록하고 딱 한 번만 잰다.** 사전등록 문서는 해시로 남기고 표본 외 구간은 하드 잠가서 최종 실행은 한 번이다. 사전등록 프로그램은 2026년 10월에 전진 판정 전부 기각으로 공식 종결했다 — 호가 흐름 스캘핑, 호가 시뮬레이터 위의 LightGBM 과 Double-DQN, 대기열을 아는 지정가 진입 엔진, 그리고 마지막엔 사후에 완벽히 고른 청산조차 이 유니버스에선 소매 왕복 비용을 못 넘는다는 오라클 측정까지 |
+| **daytrade-it**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | 국내주식 뉴스 데이트레이딩 시스템. 데몬이 토스 뉴스를 폴링하면 Claude 는 **사실만** 뽑는다 — 이 회사가 기사의 주인공인지, 새 소식인지, 어느 방향인지. 매매 판단은 시키지 않고 점수는 코드가 매긴다. 그 종목에 중대 DART 공시가 걸려 있으면 진입을 거부하고, 그 캐시가 없거나 낡아도 거부한다 — 게이트가 조용히 통과시키는 일이 없게. **2026년 9월에 사흘간 무인 실주문을 냈고 멈췄다**: 뉴스 선정의 초과수익이 매칭 대조군 대비 몇 bp 인데 왕복 비용은 37bp 가까웠다. 그 뒤로는 종이매매로 돌려 판정 아카이브만 계속 쌓는다. 이어서 4단계 사전등록 파이프라인을 돌렸다 — 순위 자체는 진짜였지만(표본 외 IC 유지) 학습한 진입·청산 정책은 상수로 수렴했고 어느 단계도 노이즈 대조를 못 넘었다. **2026년 10월 판정: 이 방식의 뉴스 데이트레이딩엔 비용을 넘는 우위가 없다.** 레포에는 리플레이 엔진과 원장, 그리고 기록이 남는다 |
+| **quantbox**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | 바이낸스 USDT-M 선물 브레이크아웃/모멘텀 시스템 — VR 압축 스퀴즈 + MA 클러스터 스퀴즈. 실거래로 운용했고 지금은 봇을 멈춰 뒀다. 공개된 `binance-quant-engine` 은 여기서 전략만 걷어낸 것이다 |
 | **momentum**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | 미국주식 스크리너. Minervini 추세 템플릿과 VCP 패턴을 DuckDB 캐시 위에 올려 CLI 로 돌린다 |
-| **daytrade-it**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | 국내주식(코스피·코스닥) 뉴스 데이트레이딩 시스템. `trader` 의 두 번째 실매매 프로세스이고 **2026-09-14 부터 무인 실주문**을 낸다. 데몬이 토스 뉴스를 폴링하면 Claude 는 **사실만** 뽑는다 — 이 회사가 기사의 주인공인지, 새 소식인지, 어느 방향인지. 매매 판단은 시키지 않고 점수는 코드가 매긴다. 매수는 그 종목이 이미 달려 버리지 않았을 때만 낸다. scalp-it 이 따로 도달한 "추격 금지"와 같은 결론이다. 이 규칙은 **결과를 라벨로 붙인 평가셋에서 홀드아웃 구간까지 확인하고** 골랐다. 가격만 보는 ML 모델(정확도 38.5%, 기준선 38.1%)과 모델에게 주가 반응을 직접 예측시키는 방식은 둘 다 이보다 못했다. 다만 홀드아웃은 10거래일뿐이다. 주문은 1주·지정가·가격 밴드, 종목당 하루 1회, 동시 보유 최대 5종목이고(첫 실매매일에 09:00 에 두 자리가 다 차서 이후 신호 ~25건을 건너뛴 뒤 2에서 올렸다), 미체결 진입은 취소하며 15:00 부터 자기가 산 주식만 되판다. 안 팔리면 동시호가가 끝날 때까지 매번 호가를 조금씩 더 낮춘다. 분봉 청산 규칙 탐색을 dev 구간에서 후보를 얼린 뒤 test 구간에 댔지만 이 15:00 일괄 청산을 이기지 못해 그대로 둔다. 기사 전문은 그림자로 채점해 앞으로의 근거를 쌓는다. scalp-it 의 DART 캐시에 최근 일주일 안의 중대 공시(상장폐지 우려·횡령·회생 등)가 있으면 진입을 거부하고, 그 캐시가 없거나 오래됐을 때도 거부한다 — 게이트가 조용히 통과시키는 일이 없게 했다. `gpt-quant-v2` 를 다시 짰다 |
 | **crypto-pair-trading**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | 암호화폐 페어 트레이딩 프레임워크의 첫 판. `quantbox` 가 여기서 나왔다 |
 | **resume-private**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | 이력서 비공개 원본 (LaTeX) |
 
+<h3><img src="https://img.shields.io/badge/%F0%9F%93%90%20%EC%88%AB%EC%9E%90%EA%B0%80%20%EB%A7%90%ED%95%98%EB%8A%94%20%EA%B2%83-B91C1C?style=for-the-badge&labelColor=1E293B" height="26" alt="숫자가 말하는 것"/></h3>
+
+비공개 레포 둘이 같은 시장을 따로 재서 같은 벽에 닿았다. 두 레포의 종합 문서는 전략이 아니라 연구 기록이고, 한국 주식 스택이 지금까지 낸 것 중 가장 쓸모 있는 산출물이다.
+
+- **벽은 비용이다.** 현물 왕복 비용은 약 41.5bp — 거래세 20bp, 수수료 3bp, 나머지는 스프레드. 두 팀이 잰 것 중 이 선을 유의하게 넘는 건 없었다. 오라클 청산도, 뉴스 순위도, 학습한 정책도.
+- **모형이 약한 게 아니라 칸이 틀렸다.** 거래대금 상위 유니버스는 장중에 하루 약 28bp 를 잃고 야간에 그만큼을 되찾는다. 이 패턴은 십 년 넘게 이어졌다. 보유→종가 청산 전략은 매일 이 역풍을 먹고 출발하고, 손실의 절반 이상이 개장 첫 5분에 난다.
+- **정보가 병목이 아니다.** 뉴스 순위는 *어느* 기사가 튈지를 안정적인 표본 외 IC 로 맞힌다. 돈이 안 될 뿐이다 — 경제 곡선은 어느 컷에서도 음수고, 지연을 0 으로 줄여도 한 자릿수 bp 가 보태진다.
+- **통과한 유일한 알파는 운용되지 않는다.** PEAD 는 swing-it 의 관문을 전부 넘었지만 어느 크론도 그걸 돌리지 않는다. 그게 남은 과제다.
+
 <h3><img src="https://img.shields.io/badge/%F0%9F%96%A5%EF%B8%8F%20%EC%9A%B4%EC%98%81-0F766E?style=for-the-badge&labelColor=1E293B" height="26" alt="운영"/></h3>
 
-여기 적힌 것들은 레포로만 있는 게 아니라 지금도 돌고 있다. **레포는 같이 쓰지만 하는 일이 다른 두 호스트**로 나뉜다. 선을 긋는 규칙은 한 줄이다 — **다시 못 하는 일은 `trader` 에 남고, 다시 돌릴 수 있는 일은 `simnode` 로 간다.** 틱과 호가는 소급 수집이 안 되니 장중 한 시간을 놓치면 영원히 없지만, 실패한 배치는 내일 다시 돌리면 그만이다.
-
-```mermaid
-flowchart TB
-    KW(["키움<br/>앱키 하나"])
-
-    subgraph T ["🖥️ trader — 라이브"]
-        SC["scalp-it<br/>수집 + 실주문"]
-        DT["daytrade-it<br/>뉴스 → 1주 매매"]
-        DD[("dart.db<br/>로컬 SQLite")]
-        RP[("TimescaleDB<br/>대기 리플리카<br/>읽는 앱 없음")]
-    end
-
-    subgraph S ["🖥️ simnode — 재현 가능"]
-        AF["quant-airflow<br/>DAG 16개"]
-        PR[("TimescaleDB PRIMARY<br/>kr_quant · gptquant")]
-        RS["swing-it · portfolio-research<br/>macro-sector-agent · momentum<br/>백테스트"]
-    end
-
-    KW <-->|"틱 · 호가 · 주문"| SC
-    KW <-->|"시세 · 주문"| DT
-    DD -->|"10분마다 DART"| SC
-    SC <-->|"쓰기: 틱 · 호가, 스풀<br/>읽기: 유니버스 · 시황"| PR
-    DT <-->|"쓰기: 신호<br/>읽기: 일봉"| PR
-    AF -->|"시세 · news_judgments"| PR
-    PR -->|"스트리밍 복제"| RP
-    PR --> RS
-
-    classDef live fill:#B45309,stroke:#78350F,color:#FFFFFF
-    classDef repro fill:#059669,stroke:#065F46,color:#FFFFFF
-    classDef store fill:#2563EB,stroke:#1E40AF,color:#FFFFFF
-    classDef ext fill:#64748B,stroke:#334155,color:#FFFFFF
-
-    class SC,DT live
-    class AF,RS repro
-    class RP,PR,DD store
-    class KW ext
-
-    style T fill:#0F172A08,stroke:#64748B
-    style S fill:#0F172A08,stroke:#64748B
-```
-
-<sub>DB 로 드나드는 화살표는 전부 LAN 을 건너 `simnode` 로 간다. `trader` 에서 자기 리플리카를 읽는 프로세스는 하나도 없다 — 리플리카는 조회용이 아니라 승격용이다.</sub>
-
-| | **`trader`** — 라이브 머신 | **`simnode`** — 리서치 머신 |
-|---|---|---|
-| **역할** | 되돌릴 수 없고 시계에 묶인 일 — 장중은 한 번뿐이다 | 다시 돌릴 수 있는 일 — 오케스트레이션·배치·리서치 |
-| **도는 것** | `scalp-it` 틱·호가 수집과 실주문 · `daytrade-it` 뉴스 기반 실주문 · `quantbox`(중단 중) · `kiwoom-client` 개발 — 브로커 세션은 키 하나당 하나라 그 세션이 여기 있다 | Airflow 스케줄러·웹서버(16개 DAG) · TimescaleDB **PRIMARY** · `swing-it`·`portfolio-research`·`macro-sector-agent`·`momentum` · 마감 후 리서치 배치 · **백테스트** |
-| **공유 레포** | `quant-airflow` 만 **`git sparse-checkout`** 으로 있다 — 리플리카 compose, 스키마, 그리고 라이브 프로세스가 브로커 키·Claude 키·DB 접속 정보를 읽어 가는 `.env` 하나. 리서치 전용 레포는 아예 없다 | 정본 전체 클론 |
-| **TimescaleDB** | 대기용 스트리밍 리플리카 | PRIMARY — 두 호스트의 읽기·쓰기가 전부 여기로 온다 |
-
-**라이브 시스템은 둘인데 계좌는 하나다.** 둘은 서로 다른 근거로 매매하고 서로의 존재를 모른다. 공유하는 건 계좌뿐이다.
-
-```mermaid
-flowchart LR
-    subgraph SCP ["scalp-it — 완전 무인, 08:55–15:20"]
-        WS["키움 WebSocket<br/>틱 · 호가"] --> DET["짝꿍 감지기<br/>대장 → 후속주"]
-        DART[("dart.db")] -->|"돌발 공시"| DET
-        DET --> GRD["주문 가드<br/>수량 캡 · 가격 밴드 · 일일 주문 한도<br/>연속손절 킬 · pair_STOP"]
-    end
-
-    subgraph DTP ["daytrade-it — 완전 무인, 09:00–15:30"]
-        TOSS["토스 뉴스"] --> CL["Claude<br/>사실만 추출, 매매 판단 금지"]
-        CL --> TC["추격 금지 필터<br/>전일 종가 대비"]
-        TC -->|"매수만"| SIG[("gptquant<br/>trading_signals")]
-        SIG --> AT["AutoTrader<br/>종목당 1회 · 동시 5종목<br/>미체결 취소 · 15:00–15:30 자기 몫 매도"]
-        AT --> ET["execute_trade<br/>1주 · 지정가 · 가격 밴드<br/>DART 게이트 · live_STOP"]
-    end
-
-    ACC{{"키움 계좌<br/>같은 앱키"}}
-
-    DART -->|"최근 7일 중대 공시<br/>오래되면 거부"| ET
-
-    GRD -->|"실주문"| ACC
-    ET -->|"실주문"| ACC
-    ACC -. "보유 종목 → 매수 거부" .-> GRD
-    ACC -. "보유 종목 → 중복 진입 거부" .-> ET
-
-    classDef live fill:#B45309,stroke:#78350F,color:#FFFFFF
-    classDef store fill:#2563EB,stroke:#1E40AF,color:#FFFFFF
-    classDef gate fill:#B91C1C,stroke:#7F1D1D,color:#FFFFFF
-    classDef ext fill:#64748B,stroke:#334155,color:#FFFFFF
-
-    class DET,CL,TC,AT live
-    class DART,SIG store
-    class GRD,ET gate
-    class WS,TOSS,ACC ext
-
-    style SCP fill:#0F172A08,stroke:#64748B
-    style DTP fill:#0F172A08,stroke:#64748B
-```
-
-<sub>빨강은 주문 직전의 마지막 관문이다. 점선은 각자 매수 전에 계좌에서 읽어 오는 것이다.</sub>
+2026-10-07 부터 전부 **상시 호스트 한 대, `simnode`** 에서 돈다. 그 전 한 달은 `trader` 라는 두 번째 머신이 라이브 데몬과 스트리밍 리플리카를 맡았는데, 사전등록 프로그램이 닫히자 분리가 제값을 못 해 머신을 처분했다. 리플리카도 함께 사라졌다 — DB 의 두 번째 사본은 이제 매일 밤의 구글 드라이브 백업이다.
 
 평일 하루(KST):
 
-| 시각 | `trader` | `simnode` |
-|---|---|---|
-| **07:50–08:50** | CI 게이트 동기화 — GitHub 체크가 초록인 커밋까지만 fast-forward 하고, 레포별 크론 파일을 설치한다 · 08:50 에 origin 보다 뒤처진 레포가 없는지 한 번 더 확인 | 같은 동기화 |
-| **08:30–08:45** | 전일 아침 리포트 · DART 를 `dart.db` 로 갱신 · 라이브 시스템별 개장 전 점검 두 개(읽기 전용) | `premarket_news_judgment` — 토스 + DART → Claude → `news_judgments` |
-| **08:55** | 런처 둘이 뜬다 — scalp-it 감지기는 PRIMARY 에서 오늘 유니버스를 읽고, daytrade-it 은 계좌 보유를 스냅샷으로 떠 두어 자기가 산 것만 팔게 한다 | |
-| **09:00–15:20** | scalp-it 수집·매매 · daytrade-it 은 09:00:30–14:30 에 진입하고 15:00 부터 자기 몫을 정리 · 10분마다 DART · 09:10·10:00 틱 헬스체크 | 10:05 `daily_news` 와 수집 캐치업 · 11:35 Airflow 헬스체크 |
-| **15:20–16:10** | scalp-it 은 15:20 에 종료, daytrade-it 은 뉴스만 끊고 15:30 동시호가 끝까지 청산을 관리(15:40 강제 종료가 백스톱) · 당일 아침 리포트 · 틱 sanity · 테마 스냅샷 → PRIMARY | 16:00 `daily_collection`·`daily_earnings` · 16:05 `daily_news` 한 번 더 · 뉴스 판단 그림자 리포트 |
-| **16:55–19:00** | | 수정주가 · 컨센서스 · `swing-it` 일일 리포트 · 커버리지 · 구글 드라이브 백업 |
+| 시각 | 도는 것 |
+|---|---|
+| **06:30** | `daily_finalize` — 전날의 잠정 일봉·수급·업종지수를 확정치로 다시 받는다 |
+| **07:50** | CI 게이트 동기화 — 모든 레포가 GitHub 체크가 초록인 커밋까지만 fast-forward 하고 자기 크론을 설치한다 · 08:50 에 origin 보다 뒤처진 레포가 없는지 한 번 더 |
+| **08:30–08:45** | 전일 아침 리포트 · DART 갱신 · 라이브 시스템별 개장 전 점검(읽기 전용) · `premarket_news_judgment` |
+| **08:55** | 런처 둘이 뜬다 — scalp-it 감지기는 DB 에서 오늘 유니버스를 읽고, daytrade-it 데몬은 종이매매로 시작한다 |
+| **09:00–15:20** | scalp-it 수집·매매 · 10분마다 DART · 틱 헬스체크 · 10:05 수집 캐치업과 `daily_news` · 11:35 Airflow 헬스체크 |
+| **15:20–16:15** | scalp-it 종료, daytrade-it 은 동시호가까지 종이 청산을 관리 · 당일 리포트 · daytrade-it 전진 게이트 · 16:00 `daily_collection`·`daily_earnings`·틱 sanity · 16:05 `daily_news`·그림자 채점 · 오늘 틱을 드라이브로 |
+| **16:55–19:00** | 수정주가 · 컨센서스 · 토스 종목별 뉴스 · 야간 리서치 스윕 · `swing-it` 일일 리포트 · 커버리지 · 전체 드라이브 백업 |
 
-- **같은 레포가 양쪽에 있다고 양쪽 다 정본인 건 아니다.** 설정 수정은 `simnode` 의 전체 클론에서 하고 push 한다. `trader` 는 pull 만 한다 — sparse checkout 이라 거꾸로 하기가 어렵다.
-- **어느 쪽이 PRIMARY 인지는 코드가 아니라 상태다.** `pg_is_in_recovery()` 가 답하고, 그 답은 이미 한 번 뒤집혔다. 처음엔 LAN 순단에 수집기가 죽지 않도록 `trader` 가 PRIMARY 였는데, 수집기에 재연결과 디스크 스풀이 들어가 순단을 스스로 버티는 게 운영에서 확인된 날 `simnode` 로 승격했다. 강등된 쪽은 리플리카로 재구성했다 — compose 파일 이름까지 그대로 둔 채.
-- **라이브 머신은 매일 아침 리서치 머신에 기댄다.** 스풀은 나가는 틱을 지킬 뿐 들어오는 입력은 못 지킨다. scalp-it 의 유니버스와 시황, daytrade-it 의 전일 종가는 전부 PRIMARY 에서 읽는다 — 전날 16:00 수집으로 만든 값이다. 그 조회가 실패하면 scalp-it 은 고정 쌍으로 폴백하고, daytrade-it 은 진입하지 않는다.
-- **계좌는 하나인데 킬스위치는 따로다.** 둘 다 매수 직전에 브로커에서 잔고를 조회해 이미 보유한 종목은 사지 않는다. 그래서 먼저 들어간 쪽이 청산할 때까지 그 종목을 가진다. 현금도 같이 쓴다 — daytrade-it 자체 한도는 다섯 종목이지만, 계좌 보유 평가액이 ~50만 원을 넘으면 리스크 매니저가 새 진입을 거부한다. daytrade-it 은 scalp-it 에도 기댄다 — 공시 게이트가 scalp-it 의 DART 캐시를 읽으므로, 그 크론이 멈추면 daytrade-it 도 매수를 멈춘다. 하지만 `pair_STOP` 은 scalp-it 만 멈추고, `live_STOP` 은 daytrade-it 의 *진입*만 멈춘다 — 청산은 계속 돈다. 열린 포지션을 버려두는 킬스위치는 안전장치가 아니기 때문이다.
-- **백테스트는 `simnode` 에서만 돈다.** `trader` 의 CPU 는 라이브 데몬 몫이라, 두 라이브 시스템의 백테스트 진입점은 호스트 이름을 확인하고 다른 곳에서는 실행을 거부한다 — 레포마다 사본을 두지 않고 `krx-quant-core` 의 가드 하나를 쓴다. `swing-it` 은 이제 `trader` 에 체크아웃조차 없다.
-- **시스템은 셋이어도 시장 규칙은 하나다.** 호가단위 표, 가격제한폭, 주문 가드 판정, 공시 분류가 레포마다 따로 있었고 이미 어긋나 있었다 — 같은 `normalize_code` 가 두 군데 복붙돼 있었고, 비용 가정은 `0.0023`·`0.0034`·`0.0064` 로 흩어진 채 거래세가 4년 동안 네 번 바뀌었다는 개념조차 없었다. 이제는 전부 `krx-quant-core` 에서 온다. 라이브 트레이더를 옮기는 건 돈을 옮기듯 했다 — 무작위 입력으로 옛 코드와 나란히 대조하고(주문 수만 건, DART 캐시의 공시 전부), 새 코드가 똑같이 나올 때까지 운영 체크아웃은 건드리지 않았고, 옮긴 뒤 개장 전 점검 두 개를 끝까지 돌렸다.
-- **크론도 코드이고, 라이브 머신은 빨간 CI 를 받지 않는다.** 크론은 `crontab -e` 가 아니라 레포마다 `deploy/crontab.<호스트>` 로 커밋한다. 설치기는 레포별 울타리 구역에 나눠 넣고, 잘못된 줄이 하나라도 있으면 설치하지 않는다 — 깨진 체크아웃이 08:55 런처를 지우지 못하게. 07:50 에는 두 호스트가 체크가 초록인 커밋까지만 fast-forward 하므로, 에이전트가 밤사이 CI 실패인 커밋을 올려도 `trader` 는 어제 코드로 돈다. 그 앞단에서는 pre-push 훅이 레포의 `ci.yml` 을 로컬에서 먼저 돌린다.
-- **배치를 옮겨도 시각은 안 옮겼다.** 크론 트리거는 호스트가 아니라 DB 에서 데이터가 확정되는 시점에 맞춰져 있어서, 분리 전후의 스케줄이 똑같이 읽힌다.
-- **백업은 PRIMARY 를 따라간다.** 승격 뒤에도 두 호스트가 19:00 에 날짜 이름으로 드라이브 백업을 올렸는데, 나중에 끝난 쪽이 덮어쓰니 `trader` 의 낡은 스탠바이 덤프가 그날 파일이 될 수 있었다. 지금은 `simnode` 에서만 돈다.
-- 반대로 **꺼야 했던 것** 하나 — 내려간 DB 컨테이너를 되살리는 헬스 가드다. 그대로 뒀으면 강등된 옛 PRIMARY 를 깨워 split-brain 을 만들었을 것이다. 스크립트 파일은 `trader` 가 다시 PRIMARY 를 맡을 날을 위해 디스크에 남겨뒀다.
+- **크론도 코드이고, 호스트는 빨간 CI 를 받지 않는다.** 레포마다 `deploy/crontab.simnode` 를 커밋한다. 설치기는 레포별 울타리 구역에 나눠 넣고 잘못된 줄이 하나라도 있으면 설치하지 않는다 — 깨진 체크아웃이 08:55 런처를 지우지 못하게. push 하면 원격 반영을 확인한 뒤 같은 설치가 돌고, 그 앞단에서 pre-push 훅이 레포의 `ci.yml` 을 로컬에서 먼저 돌린다.
+- **시장 규칙은 하나다.** 호가단위 표, 가격제한폭, 주문 가드 판정, 비용 가정, 공시 분류가 레포마다 따로 있었고 이미 어긋나 있었다. 이제는 전부 `krx-quant-core` 에서 온다. 라이브 트레이더를 옮기는 건 돈을 옮기듯 했다 — 무작위 입력으로 옛 코드와 나란히 대조하고, 새 코드가 똑같이 나올 때까지 운영 체크아웃은 건드리지 않았다.
+- **열린 포지션을 버려두는 킬스위치는 안전장치가 아니다.** `pair_STOP` 은 scalp-it 을 멈추고, `live_STOP` 은 daytrade-it 의 *진입*만 멈춘다 — 청산은 계속 돈다. 둘 다 매수 직전에 브로커에서 잔고를 조회해 이미 보유한 종목은 사지 않는다.
+- **측정이 주문보다 앞선다.** 두 라이브 시스템은 호스트 이름을 확인해 여기 아닌 곳에서는 백테스트를 거부하고, 모든 백테스트는 실행 원장에 적히고, 표본 외 구간은 첫 번째로 보기 전에 잠긴다. 기각도 코드와 같은 정성으로 커밋한다.
+- **라이브 루프는 전날 배치에 기댄다.** 유니버스, 시황, 전일 종가는 전부 전날 16:00 수집에서 읽는다. 그 조회가 실패하면 scalp-it 은 고정 쌍으로 폴백하고 daytrade-it 은 진입하지 않는다.
+- **어느 쪽이 PRIMARY 인지는 코드가 아니라 상태였다.** `pg_is_in_recovery()` 가 답했고, 두 호스트 시절 그 답은 한 번 뒤집혔다. 그때 반대로 *꺼야* 했던 것 하나 — 내려간 DB 컨테이너를 되살리는 헬스 가드. 그대로 뒀으면 강등된 옛 PRIMARY 를 깨워 split-brain 을 만들었을 것이다.
 
 <h3><img src="https://img.shields.io/badge/%F0%9F%9B%A0%EF%B8%8F%20TECH-7C3AED?style=for-the-badge&labelColor=1E293B" height="26" alt="Tech"/></h3>
 
