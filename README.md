@@ -36,7 +36,7 @@ flowchart TB
 
     subgraph CX ["🪙 Crypto"]
         direction LR
-        EX["Exchange APIs"] --> CR["binance-quant-engine"]
+        EX["Exchange APIs"] --> CR["binance-quant-engine"] --> CI["crypto-quant-insights"]
     end
 
     FC["fin-checkup<br/>DART · SEC EDGAR"]
@@ -49,7 +49,7 @@ flowchart TB
 
     class SRC,SH,EX,FC source
     class AF,DB,DD move
-    class SW,DT,SC,KC,PR,CR out
+    class SW,DT,SC,KC,PR,CR,CI out
 
     style KR fill:#0F172A08,stroke:#64748B
     style US fill:#0F172A08,stroke:#64748B
@@ -70,6 +70,7 @@ flowchart TB
 | **[portfolio-research](https://github.com/younghwan91/portfolio-research)**<br/><img src="https://img.shields.io/badge/RESEARCH-059669?style=flat-square&labelColor=1E293B" alt="RESEARCH"/> | US equity factor engine — point-in-time, survivorship-bias-free, walk-forward gated by **Deflated Sharpe &amp; PBO**, plus tactical ETF allocation. **Ships the rejections too**: every pre-registered TAA config failed the PBO gate, and one headline number was retracted · [writeup](https://younghwan91.github.io/portfolio-research/) |
 | **[macro-sector-agent](https://github.com/younghwan91/macro-sector-agent)**<br/><img src="https://img.shields.io/badge/RESEARCH-059669?style=flat-square&labelColor=1E293B" alt="RESEARCH"/> | Top-down US sector-cycle research — it asks **which industry has been forgotten**, not what to buy. An LLM judge argues from evidence over whether a theme is a cycle trough or a structural death, only at that narrow waist; everything above and below is deterministic. **The machine never picks — it only excludes** |
 | **[binance-quant-engine](https://github.com/younghwan91/binance-quant-engine)**<br/><img src="https://img.shields.io/badge/CRYPTO%20ENGINE-EA580C?style=flat-square&labelColor=1E293B" alt="CRYPTO ENGINE"/> | Strategy-agnostic Binance USDT-M futures backtest &amp; execution engine — zero lookahead, backtest↔live parity, exits placed as exchange-side algo orders, optional MCP server |
+| **[crypto-quant-insights](https://github.com/younghwan91/crypto-quant-insights)**<br/><img src="https://img.shields.io/badge/RESEARCH-059669?style=flat-square&labelColor=1E293B" alt="RESEARCH"/> | Chart-backed research notes from validating that live futures system — crash stress tests across market regimes, win rate vs. reward-to-risk, in-sample vs. out-of-sample divergence, Kelly leverage vs. what's actually run, and the gap between a backtest fill and the live one. The strategy stays private; the findings don't |
 | **[automated-stock-trading-systems](https://github.com/younghwan91/automated-stock-trading-systems)**<br/><img src="https://img.shields.io/badge/RESEARCH-059669?style=flat-square&labelColor=1E293B" alt="RESEARCH"/> | Backtester for Bensdorp's seven non-correlated trading systems (educational reimplementation) |
 
 <h3><img src="https://img.shields.io/badge/%F0%9F%94%92%20PRIVATE-64748B?style=for-the-badge&labelColor=1E293B" height="26" alt="Private"/></h3>
@@ -81,7 +82,6 @@ Strategies and parameters stay closed. Only structure and discipline are written
 | **scalp-it**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | Korean intraday validation framework + live tick/orderbook collection + **a live execution loop** — since late August 2026 its detector sends real one-share orders under a hard-capped size, a price band, a daily order cap and a consecutive-loss kill switch. Ticks can't be backfilled, so a missed day is gone for good. **Pre-register, measure once.** Pre-registrations are hashed and the out-of-sample window is hard-locked, so the final run happens once. The pre-registered program closed in October 2026 with every forward verdict rejected — orderbook-flow scalping, LightGBM and Double-DQN on an orderbook simulator, a queue-aware limit-entry engine, and finally an oracle test that showed even perfect hindsight exits don't clear retail round-trip cost in this universe |
 | **daytrade-it**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | Korean-equity news day-trading system. A daemon polls Toss news; Claude extracts **facts only** — is the company the subject, is it new, which direction — never a trade call; scoring is code. Entries are refused while a hard-severity DART filing sits on the ticker, and also while that cache is missing or stale, so the gate can't pass trades silently. **Live, unattended, for three sessions in September 2026, then stopped**: the news-selection edge measured a few bp against a matched null with a round-trip cost near 37 bp. It has run in paper mode since, so the judgment archive keeps growing. A four-stage pre-registered pipeline followed — the ranking is real (out-of-sample IC held up), but the learned entry and exit policies collapsed to constants and no stage cleared its noise control. **Verdict, October 2026: news day-trading, done this way, has no edge over cost.** The repo keeps the replay engine, the ledger and the write-ups |
 | **quantbox**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | Binance USDT-M futures breakout/momentum system — VR compression squeeze + MA cluster squeeze. Traded live; the bot is currently paused. `binance-quant-engine` is the public extract with the strategies removed |
-| **momentum**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | US equity screener — Minervini Trend Template + VCP pattern, DuckDB-cached, CLI-driven |
 | **crypto-pair-trading**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | First iteration of the crypto pair-trading framework — predecessor of `quantbox` |
 | **resume-private**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | Private résumé source (LaTeX) |
 

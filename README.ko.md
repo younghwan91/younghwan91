@@ -36,7 +36,7 @@ flowchart TB
 
     subgraph CX ["🪙 암호화폐"]
         direction LR
-        EX["거래소 API"] --> CR["binance-quant-engine"]
+        EX["거래소 API"] --> CR["binance-quant-engine"] --> CI["crypto-quant-insights"]
     end
 
     FC["fin-checkup<br/>DART · SEC EDGAR"]
@@ -49,7 +49,7 @@ flowchart TB
 
     class SRC,SH,EX,FC source
     class AF,DB,DD move
-    class SW,DT,SC,KC,PR,CR out
+    class SW,DT,SC,KC,PR,CR,CI out
 
     style KR fill:#0F172A08,stroke:#64748B
     style US fill:#0F172A08,stroke:#64748B
@@ -70,6 +70,7 @@ flowchart TB
 | **[portfolio-research](https://github.com/younghwan91/portfolio-research)**<br/><img src="https://img.shields.io/badge/RESEARCH-059669?style=flat-square&labelColor=1E293B" alt="RESEARCH"/> | 미국주식 팩터 엔진. 시점이 어긋나지 않고 생존편향을 보정한 데이터 위에서만 walk-forward 를 돌리고 **Deflated Sharpe 와 PBO** 로 거른다. ETF 전술배분도 같이 검증한다. **통과한 것만 싣지 않는다** — 사전등록한 TAA 설정은 전부 PBO 관문을 못 넘었고, 표제 숫자 하나는 스스로 철회했다 · [writeup](https://younghwan91.github.io/portfolio-research/) |
 | **[macro-sector-agent](https://github.com/younghwan91/macro-sector-agent)**<br/><img src="https://img.shields.io/badge/RESEARCH-059669?style=flat-square&labelColor=1E293B" alt="RESEARCH"/> | 하향식 미국 산업 사이클 리서치 — "지금 뭘 사야 하나"가 아니라 "**지금 어느 산업이 잊혔나**"를 묻는다. 사이클 저점인지 죽어가는 산업인지는 LLM 판별기가 증거를 놓고 따지되 파이프라인의 좁은 허리에만 두고, 그 위아래는 전부 결정론적이다. **기계는 고르지 않는다 — 제외만 한다** |
 | **[binance-quant-engine](https://github.com/younghwan91/binance-quant-engine)**<br/><img src="https://img.shields.io/badge/CRYPTO%20ENGINE-EA580C?style=flat-square&labelColor=1E293B" alt="CRYPTO ENGINE"/> | 전략을 가리지 않는 바이낸스 USDT-M 선물 백테스트·실행 엔진 — 룩어헤드 0, 백테스트↔실거래 일체화, 청산은 거래소 측 알고 주문으로 미리 걸어 둔다. MCP 서버는 옵션 |
+| **[crypto-quant-insights](https://github.com/younghwan91/crypto-quant-insights)**<br/><img src="https://img.shields.io/badge/RESEARCH-059669?style=flat-square&labelColor=1E293B" alt="RESEARCH"/> | 실거래 중인 선물 시스템을 검증하며 나온 차트 기반 연구 노트 — 시장 국면별 폭락 스트레스 테스트, 승률 대 손익비, 표본 내·표본 외 괴리, Kelly 레버리지와 실제 운용 배수의 차이, 백테스트 체결과 실거래 체결의 간극. 전략은 비공개지만 발견은 공개다 |
 | **[automated-stock-trading-systems](https://github.com/younghwan91/automated-stock-trading-systems)**<br/><img src="https://img.shields.io/badge/RESEARCH-059669?style=flat-square&labelColor=1E293B" alt="RESEARCH"/> | Bensdorp 의 비상관 트레이딩 시스템 7개를 교육용으로 다시 구현한 백테스터 |
 
 <h3><img src="https://img.shields.io/badge/%F0%9F%94%92%20%EB%B9%84%EA%B3%B5%EA%B0%9C-64748B?style=for-the-badge&labelColor=1E293B" height="26" alt="비공개"/></h3>
@@ -81,7 +82,6 @@ flowchart TB
 | **scalp-it**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | 국내 단타 검증 프레임워크 + 장중 틱·호가 실시간 수집 + **실주문 루프**. 2026년 8월 말부터 감지기가 1주 실주문을 낸다 — 수량 하드캡, 가격 밴드, 일일 주문 한도, 연속손절 킬스위치를 건 채로. 틱은 소급 수집이 안 되니 놓친 날은 영원히 없다. **사전등록하고 딱 한 번만 잰다.** 사전등록 문서는 해시로 남기고 표본 외 구간은 하드 잠가서 최종 실행은 한 번이다. 사전등록 프로그램은 2026년 10월에 전진 판정 전부 기각으로 공식 종결했다 — 호가 흐름 스캘핑, 호가 시뮬레이터 위의 LightGBM 과 Double-DQN, 대기열을 아는 지정가 진입 엔진, 그리고 마지막엔 사후에 완벽히 고른 청산조차 이 유니버스에선 소매 왕복 비용을 못 넘는다는 오라클 측정까지 |
 | **daytrade-it**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | 국내주식 뉴스 데이트레이딩 시스템. 데몬이 토스 뉴스를 폴링하면 Claude 는 **사실만** 뽑는다 — 이 회사가 기사의 주인공인지, 새 소식인지, 어느 방향인지. 매매 판단은 시키지 않고 점수는 코드가 매긴다. 그 종목에 중대 DART 공시가 걸려 있으면 진입을 거부하고, 그 캐시가 없거나 낡아도 거부한다 — 게이트가 조용히 통과시키는 일이 없게. **2026년 9월에 사흘간 무인 실주문을 냈고 멈췄다**: 뉴스 선정의 초과수익이 매칭 대조군 대비 몇 bp 인데 왕복 비용은 37bp 가까웠다. 그 뒤로는 종이매매로 돌려 판정 아카이브만 계속 쌓는다. 이어서 4단계 사전등록 파이프라인을 돌렸다 — 순위 자체는 진짜였지만(표본 외 IC 유지) 학습한 진입·청산 정책은 상수로 수렴했고 어느 단계도 노이즈 대조를 못 넘었다. **2026년 10월 판정: 이 방식의 뉴스 데이트레이딩엔 비용을 넘는 우위가 없다.** 레포에는 리플레이 엔진과 원장, 그리고 기록이 남는다 |
 | **quantbox**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | 바이낸스 USDT-M 선물 브레이크아웃/모멘텀 시스템 — VR 압축 스퀴즈 + MA 클러스터 스퀴즈. 실거래로 운용했고 지금은 봇을 멈춰 뒀다. 공개된 `binance-quant-engine` 은 여기서 전략만 걷어낸 것이다 |
-| **momentum**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | 미국주식 스크리너. Minervini 추세 템플릿과 VCP 패턴을 DuckDB 캐시 위에 올려 CLI 로 돌린다 |
 | **crypto-pair-trading**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | 암호화폐 페어 트레이딩 프레임워크의 첫 판. `quantbox` 가 여기서 나왔다 |
 | **resume-private**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | 이력서 비공개 원본 (LaTeX) |
 
