@@ -85,38 +85,6 @@ Strategies and parameters stay closed. Only structure and discipline are written
 | **crypto-pair-trading**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | First iteration of the crypto pair-trading framework — predecessor of `quantbox` |
 | **resume-private**<br/><img src="https://img.shields.io/badge/PRIVATE-64748B?style=flat-square&labelColor=1E293B" alt="PRIVATE"/> | Private résumé source (LaTeX) |
 
-<h3><img src="https://img.shields.io/badge/%F0%9F%93%90%20WHAT%20THE%20NUMBERS%20SAY-B91C1C?style=for-the-badge&labelColor=1E293B" height="26" alt="What the numbers say"/></h3>
-
-Two private repos measured the same market independently and reached the same wall. The joint write-up is a research document, not a strategy, and it is the most useful thing the Korean stack has produced so far.
-
-- **The wall is cost.** A spot round trip costs about 41.5 bp — 20 bp transaction tax, 3 bp commission, the rest spread. Nothing either team measured clears it significantly: not oracle exits, not news ranking, not learned policies.
-- **The cell is wrong, not the model.** The liquid intraday universe loses roughly 28 bp a day between open and close and gains about the same overnight, a pattern that has held for over a decade. Hold-to-close strategies start every day against that headwind, and most of the loss lands in the first five minutes.
-- **Information isn't the bottleneck.** News ranking predicts *which* article pops with a stable out-of-sample IC. It just doesn't pay: the economic curve is negative at every cutoff, and zero latency would add single-digit bp.
-- **The one alpha that passed isn't being traded.** PEAD cleared swing-it's full gate; no cron runs it anywhere. That's the open item.
-
-<h3><img src="https://img.shields.io/badge/%F0%9F%96%A5%EF%B8%8F%20OPERATIONS-0F766E?style=for-the-badge&labelColor=1E293B" height="26" alt="Operations"/></h3>
-
-Everything runs on **one always-on host, `simnode`**, since 2026-10-07. For a month before that a second box, `trader`, held the live daemons and a streaming replica; when the pre-registered programs closed, the split stopped paying for itself and the box was retired. The replica went with it — the second copy of the database is now the nightly Google Drive backup.
-
-A weekday, in KST:
-
-| Time | What runs |
-|---|---|
-| **06:30** | `daily_finalize` — yesterday's provisional bars, flows and sector indices re-collected as final |
-| **07:50** | CI-gated sync — every repo fast-forwards only to commits whose GitHub checks are green, then installs its own crontab · a last behind-origin check at 08:50 |
-| **08:30–08:45** | Morning report on yesterday · DART refresh · one read-only pre-open check per live system · `premarket_news_judgment` |
-| **08:55** | Both launchers start — scalp-it's detector reads today's universe from the DB; daytrade-it's daemon starts in paper mode |
-| **09:00–15:20** | scalp-it collects and trades · DART every 10 min · tick health checks · catch-up collection and `daily_news` at 10:05 · Airflow health at 11:35 |
-| **15:20–16:15** | scalp-it stops; daytrade-it manages paper exits through the closing auction · same-day report · daytrade-it forward gate · 16:00 `daily_collection`, `daily_earnings`, tick sanity · 16:05 `daily_news`, shadow scoring · today's ticks to Drive |
-| **16:55–19:00** | Price adjustment · consensus · per-company Toss news · nightly research sweeps · `swing-it` daily report · coverage · full Drive backup |
-
-- **Crons are code, and the host doesn't pull red CI.** Every repo carries `deploy/crontab.simnode`; an installer writes each into its own fenced block and refuses a file with a single malformed line, so a broken checkout can't erase the 08:55 launcher. A push triggers the same install once the remote confirms; a pre-push hook runs the repo's own `ci.yml` locally first.
-- **One set of market rules.** Tick tables, price limits, order-guard checks, cost assumptions and disclosure taxonomy used to live in each repo and had already drifted. They now come from `krx-quant-core`, and moving the live traders onto it was done the way you'd move money: side-by-side diffs against the old code on randomized inputs, the live checkout untouched until the new one matched.
-- **A kill switch that strands a position isn't a safety feature.** `pair_STOP` stops scalp-it; `live_STOP` stops only daytrade-it's *entries* — its exits keep running. Both systems ask the broker for holdings before buying and refuse a ticker the account already holds.
-- **Measurements come before orders.** Both live systems check the hostname and refuse to backtest anywhere but here, every backtest is written to a run ledger, and the out-of-sample window is locked before the first look. Rejections are committed with the same care as code.
-- **The live loop leans on yesterday's batch.** Universe, regime and prior close are all read from the 16:00 collection the day before. If that read fails, scalp-it falls back to a fixed pair list and daytrade-it enters nothing.
-- **Which host was PRIMARY was state, not code.** `pg_is_in_recovery()` answered it, and the answer flipped once during the two-host month. The one thing that had to be switched *off* back then was a health guard that restarts a downed DB container — left running, it would have resurrected the demoted primary into a split brain.
-
 <h3><img src="https://img.shields.io/badge/%F0%9F%9B%A0%EF%B8%8F%20TECH-7C3AED?style=for-the-badge&labelColor=1E293B" height="26" alt="Tech"/></h3>
 
 <p>
