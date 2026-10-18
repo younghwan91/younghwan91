@@ -19,45 +19,40 @@
 세 스택이 같은 뼈대를 쓴다. **수집하고, 저장하고, 그 위에서만 검증한다.** 한국 주식 쪽이 가장 두텁다. 클라이언트 라이브러리들이 Airflow 하나를 거쳐 TimescaleDB 에 쌓이고, 공통 코어가 시장 규칙을 맞추고, 리서치·매매 레포는 거기서 읽는다. 전략 탐색도 최적화로 다루되 공짜로 두지 않는다. 격자 스윕이든 Optuna TPE 든 CMA-ES 진화 엔진이든 돌려 본 설정은 전부 실행 원장에 남기고, Deflated Sharpe 와 PBO 가 그 횟수만큼 값을 매기며, 표본 외 구간은 딱 한 번만 연다.
 
 ```mermaid
-%%{init: {"flowchart": {"useMaxWidth": false, "nodeSpacing": 20, "rankSpacing": 25}, "themeVariables": {"fontSize": "12px"}}}%%
+%%{init: {"flowchart": {"useMaxWidth": false, "nodeSpacing": 12, "rankSpacing": 18, "padding": 6}, "themeVariables": {"fontSize": "11px"}}}%%
 flowchart TB
     subgraph KR ["🇰🇷 한국 주식"]
         direction LR
-        SRC["kiwoom-client<br/>krx-news-client<br/>krx-fundamentals-client"] --> AF["quant-airflow"] --> DB[("TimescaleDB<br/>상장폐지 포함")]
-        DB --> SW["swing-it"]
-        DB --> DT["daytrade-it"]
-        DB --> SC["scalp-it"]
-        KC["krx-quant-core<br/>공통 시장 규칙"] --> SW & DT & SC
+        SRC["kiwoom-client<br/>krx-news-client<br/>krx-fundamentals-client"] --> AF["quant-airflow"] --> DB[("TimescaleDB")] --> RS["swing-it · daytrade-it · scalp-it"]
+        KC["krx-quant-core"] --> RS
     end
 
     subgraph US ["🇺🇸 미국 주식"]
         direction LR
-        SH["Sharadar<br/>09-10 에서 멈춤"] --> DD[("DuckDB<br/>시점 정합")] --> PR["portfolio-research<br/>macro-sector-agent"]
+        SH["Sharadar"] --> DD[("DuckDB")] --> PR["portfolio-research · macro-sector-agent"]
     end
 
     subgraph CX ["🪙 암호화폐"]
         direction LR
-        EX["거래소 API"] --> CR["binance-quant-engine"] --> CI["crypto-quant-insights"]
+        EX["Exchange APIs"] --> CR["binance-quant-engine"] --> CI["crypto-quant-insights"]
     end
 
-    FC["fin-checkup<br/>DART · SEC EDGAR"]
-
-    KR ~~~ US ~~~ CX ~~~ FC
+    KR ~~~ US ~~~ CX
 
     classDef source fill:#2563EB,stroke:#1E40AF,color:#FFFFFF
     classDef move   fill:#B45309,stroke:#78350F,color:#FFFFFF
     classDef out    fill:#059669,stroke:#065F46,color:#FFFFFF
 
-    class SRC,SH,EX,FC source
+    class SRC,SH,EX source
     class AF,DB,DD move
-    class SW,DT,SC,KC,PR,CR,CI out
+    class RS,KC,PR,CR,CI out
 
     style KR fill:#0F172A08,stroke:#64748B
     style US fill:#0F172A08,stroke:#64748B
     style CX fill:#0F172A08,stroke:#64748B
 ```
 
-<sub>파랑은 데이터 원천과 단독 도구, 앰버는 수집·저장, 초록은 리서치·엔진이다. `scalp-it` 과 `daytrade-it` 은 비공개다.</sub>
+<sub>파랑은 데이터 원천, 앰버는 수집·저장, 초록은 리서치·엔진이다. `fin-checkup` 은 어느 스택에도 붙지 않는 단독 도구고, `scalp-it` 과 `daytrade-it` 은 비공개다.</sub>
 
 | 프로젝트 | 무엇인가 |
 |---|---|

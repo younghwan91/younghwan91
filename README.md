@@ -19,20 +19,17 @@
 Three stacks, one shape — **collect → store → research**. Korean equities get the most of it: client libraries feed one Airflow pipeline into TimescaleDB, a shared core fixes the market rules, and the research and trading repos read from there. The search itself is treated as optimization with a bill attached: grid sweeps, Optuna TPE and a CMA-ES evolutionary engine write every config to a run ledger, Deflated Sharpe and PBO charge for the number of trials, and the out-of-sample window opens once.
 
 ```mermaid
-%%{init: {"flowchart": {"useMaxWidth": false, "nodeSpacing": 20, "rankSpacing": 25}, "themeVariables": {"fontSize": "12px"}}}%%
+%%{init: {"flowchart": {"useMaxWidth": false, "nodeSpacing": 12, "rankSpacing": 18, "padding": 6}, "themeVariables": {"fontSize": "11px"}}}%%
 flowchart TB
     subgraph KR ["🇰🇷 Korean equities"]
         direction LR
-        SRC["kiwoom-client<br/>krx-news-client<br/>krx-fundamentals-client"] --> AF["quant-airflow"] --> DB[("TimescaleDB<br/>delisted included")]
-        DB --> SW["swing-it"]
-        DB --> DT["daytrade-it"]
-        DB --> SC["scalp-it"]
-        KC["krx-quant-core<br/>shared market rules"] --> SW & DT & SC
+        SRC["kiwoom-client<br/>krx-news-client<br/>krx-fundamentals-client"] --> AF["quant-airflow"] --> DB[("TimescaleDB")] --> RS["swing-it · daytrade-it · scalp-it"]
+        KC["krx-quant-core"] --> RS
     end
 
     subgraph US ["🇺🇸 US equities"]
         direction LR
-        SH["Sharadar<br/>frozen at 09-10"] --> DD[("DuckDB<br/>point-in-time")] --> PR["portfolio-research<br/>macro-sector-agent"]
+        SH["Sharadar"] --> DD[("DuckDB")] --> PR["portfolio-research · macro-sector-agent"]
     end
 
     subgraph CX ["🪙 Crypto"]
@@ -40,24 +37,22 @@ flowchart TB
         EX["Exchange APIs"] --> CR["binance-quant-engine"] --> CI["crypto-quant-insights"]
     end
 
-    FC["fin-checkup<br/>DART · SEC EDGAR"]
-
-    KR ~~~ US ~~~ CX ~~~ FC
+    KR ~~~ US ~~~ CX
 
     classDef source fill:#2563EB,stroke:#1E40AF,color:#FFFFFF
     classDef move   fill:#B45309,stroke:#78350F,color:#FFFFFF
     classDef out    fill:#059669,stroke:#065F46,color:#FFFFFF
 
-    class SRC,SH,EX,FC source
+    class SRC,SH,EX source
     class AF,DB,DD move
-    class SW,DT,SC,KC,PR,CR,CI out
+    class RS,KC,PR,CR,CI out
 
     style KR fill:#0F172A08,stroke:#64748B
     style US fill:#0F172A08,stroke:#64748B
     style CX fill:#0F172A08,stroke:#64748B
 ```
 
-<sub>Blue — data sources &amp; standalone tools · amber — collection &amp; storage · green — research &amp; engines. `scalp-it` and `daytrade-it` are private.</sub>
+<sub>Blue — data sources · amber — collection &amp; storage · green — research &amp; engines. `fin-checkup` stands alone; `scalp-it` and `daytrade-it` are private.</sub>
 
 | Project | What it is |
 |---|---|
