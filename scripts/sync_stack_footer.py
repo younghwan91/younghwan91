@@ -6,8 +6,8 @@
 이 스크립트가 단일 소스에서 생성하므로 그 표류가 구조적으로 생기지 않는다.
 
 사용법:
-    python scripts/sync_stack_footer.py ~/Documents/git          # 주입
-    python scripts/sync_stack_footer.py ~/Documents/git --check  # 표류 검사만 (CI 용)
+    python scripts/sync_stack_footer.py ~/git          # 주입
+    python scripts/sync_stack_footer.py ~/git --check  # 표류 검사만 (CI 용)
 
 인자는 레포 클론들이 나란히 들어있는 디렉터리다. 없는 레포는 건너뛴다.
 표준 라이브러리만 쓴다(PyYAML 불필요 — stack.yml 의 부분집합만 파싱).
@@ -19,7 +19,8 @@ import re
 import sys
 from pathlib import Path
 
-HEADING = re.compile(r"^##\s+(관련 프로젝트|Related projects)\b.*$", re.MULTILINE)
+# "## 10. 관련 프로젝트" 처럼 번호를 붙인 헤딩도 인식하고, 번호는 그대로 보존한다.
+HEADING = re.compile(r"^##\s+(?P<prefix>\d+\.\s+)?(관련 프로젝트|Related projects)\b.*$", re.MULTILINE)
 NEXT_HEADING = re.compile(r"^##\s+", re.MULTILINE)
 
 # 언어는 파일명이 아니라 기존 푸터 헤딩으로 판정한다. opt_portfolio 처럼
@@ -81,14 +82,15 @@ def parse_stack(path: Path) -> tuple[dict, list[dict]]:
     return axes, repos
 
 
-def render(axes: dict, repos: list[dict], lang: str, self_name: str) -> str:
+def render(axes: dict, repos: list[dict], lang: str, self_name: str, prefix: str = "") -> str:
     order = {"kr": 0, "us": 1, "cx": 2}
     rows = sorted(
         (r for r in repos if r["name"] != self_name),
         key=lambda r: (order.get(r["axis"], 9), repos.index(r)),
     )
     c = COLUMNS[lang]
-    out = [TITLE[lang], "", INTRO[lang], "", f"| {c[0]} | {c[1]} | {c[2]} |", "|---|---|---|"]
+    title = TITLE[lang].replace("## ", "## " + prefix, 1)
+    out = [title, "", INTRO[lang], "", f"| {c[0]} | {c[1]} | {c[2]} |", "|---|---|---|"]
     for r in rows:
         axis = axes[r["axis"]]
         mark = f"{axis['mark']} {axis[lang]}"
@@ -100,17 +102,18 @@ def render(axes: dict, repos: list[dict], lang: str, self_name: str) -> str:
 def replace_block(text: str, make_block) -> str | None:
     """기존 푸터 섹션(다음 ## 직전까지)을 갈아끼운다. 못 찾으면 None.
 
-    make_block(lang) 는 해당 문서의 언어로 푸터를 만들어 돌려준다.
+    make_block(lang, prefix) 는 해당 문서의 언어로 푸터를 만들어 돌려준다. prefix 는 헤딩 번호("10. ")다.
     """
     m = HEADING.search(text)
     if not m:
         return None
-    lang = LANG_BY_HEADING.get(m.group(1))
+    lang = LANG_BY_HEADING.get(m.group(2))
+    prefix = m.group("prefix") or ""
     if lang is None:
         return None
     tail = NEXT_HEADING.search(text, m.end())
     end = tail.start() if tail else len(text)
-    return text[: m.start()] + make_block(lang) + "\n" + text[end:]
+    return text[: m.start()] + make_block(lang, prefix) + "\n" + text[end:]
 
 
 def main() -> int:
@@ -131,7 +134,7 @@ def main() -> int:
             continue
         for path in sorted(repo_dir.glob("README*.md")):
             text = path.read_text(encoding="utf-8")
-            updated = replace_block(text, lambda lang: render(axes, repos, lang, r["name"]))
+            updated = replace_block(text, lambda lang, prefix: render(axes, repos, lang, r["name"], prefix))
             if updated is None or updated == text:
                 continue
             rel = f"{r['name']}/{path.name}"

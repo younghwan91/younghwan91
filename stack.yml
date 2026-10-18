@@ -26,8 +26,8 @@ repos:
 
   - name: krx-news-client
     axis: kr
-    ko: "한국 주식 뉴스·공시 수집 Python 클라이언트 라이브러리 (DART + 한국경제 + 더벨 + 토스)"
-    en: "Korean market news & disclosure Python client library (DART + Hankyung + TheBell + Toss)"
+    ko: "한국 주식 뉴스·공시를 한 스키마로 내주는 Python 클라이언트 라이브러리 (DART + 토스증권)"
+    en: "Korean market news & disclosures as one schema — Python client library (DART + Toss Securities)"
 
   - name: krx-quant-core
     axis: kr
@@ -51,8 +51,13 @@ repos:
 
   - name: portfolio-research
     axis: us
-    ko: "미국주식 팩터 엔진 — point-in-time·생존편향 보정 데이터 위에서 walk-forward 를 Deflated Sharpe·PBO 로 게이팅 (+ ETF 전술배분 TAA — 9개 사전등록, 채택 0)"
-    en: "US equity factor engine — walk-forward gated by Deflated Sharpe and PBO on point-in-time, survivorship-bias-free data (plus tactical ETF allocation: 9 pre-registered, 0 adopted)"
+    ko: "미국주식 팩터 엔진 — point-in-time·생존편향 보정 데이터 위에서 walk-forward 를 Deflated Sharpe·PBO 로 게이팅하고 ETF 전술배분도 같은 관문을 지난다"
+    en: "US equity factor engine — walk-forward gated by Deflated Sharpe and PBO on point-in-time, survivorship-bias-free data; tactical ETF allocation goes through the same gate"
+
+  - name: macro-sector-agent
+    axis: us
+    ko: "하향식 미국 산업 사이클 리서치 — \"어느 산업이 잊혔나\"를 묻고 기계는 제외만 한다"
+    en: "Top-down US sector-cycle research — asks which industry has been forgotten, not what to buy; the machine excludes, never picks"
 
   - name: automated-stock-trading-systems
     axis: us
@@ -63,3 +68,8 @@ repos:
     axis: cx
     ko: "암호화폐 선물 백테스트·실행 엔진 — 룩어헤드 0, 백테스트↔실거래 일체화"
     en: "Crypto futures backtest & execution engine — zero lookahead, backtest↔live parity"
+
+  - name: crypto-quant-insights
+    axis: cx
+    ko: "실거래 선물 시스템을 검증하며 나온 차트 연구 노트 — 폭락 스트레스 테스트·Kelly 레버리지·체결 간극"
+    en: "Chart-backed research notes from validating a live futures system — crash stress tests, Kelly leverage, live/backtest execution gaps"
