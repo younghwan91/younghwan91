@@ -18,7 +18,7 @@ flowchart LR
     K1["🇰🇷 키움 · 뉴스 · 재무 클라이언트"] --> K2[("quant-airflow<br/>TimescaleDB")] --> K3["swing-it · sector-flow<br/>daytrade-it · scalp-it"]
     KC["krx-quant-core"] --> K3
     U1["🇺🇸 Sharadar"] --> U2[("DuckDB")] --> U3["portfolio-research<br/>macro-sector-agent"]
-    C1["🪙 거래소 API"] --> C2["binance-quant-engine"] --> C3["crypto-quant-insights"]
+    C1["🪙 거래소 API"] --> C2["quantbox"] --> C3["crypto-quant-insights"]
 
     classDef src  fill:#2563EB,stroke:#1E40AF,color:#FFFFFF
     classDef pipe fill:#7C3AED,stroke:#5B21B6,color:#FFFFFF
@@ -36,5 +36,5 @@ flowchart LR
 
 - **한국** — [kiwoom-client](https://github.com/younghwan91/kiwoom-client) · [krx-news-client](https://github.com/younghwan91/krx-news-client) · [krx-fundamentals-client](https://github.com/younghwan91/krx-fundamentals-client) · [quant-airflow](https://github.com/younghwan91/quant-airflow) · [krx-quant-core](https://github.com/younghwan91/krx-quant-core) · [swing-it](https://github.com/younghwan91/swing-it) · [sector-flow](https://github.com/younghwan91/sector-flow) · [daytrade-it](https://github.com/younghwan91/daytrade-it) · [scalp-it](https://github.com/younghwan91/scalp-it)
 - **미국** — [portfolio-research](https://github.com/younghwan91/portfolio-research) · [macro-sector-agent](https://github.com/younghwan91/macro-sector-agent)
-- **크립토** — [binance-quant-engine](https://github.com/younghwan91/binance-quant-engine) · [crypto-quant-insights](https://github.com/younghwan91/crypto-quant-insights)
+- **크립토** — [quantbox](https://github.com/younghwan91/quantbox) · [crypto-quant-insights](https://github.com/younghwan91/crypto-quant-insights)
 - **도구** — [fin-checkup](https://github.com/younghwan91/fin-checkup) · [automated-stock-trading-systems](https://github.com/younghwan91/automated-stock-trading-systems)
