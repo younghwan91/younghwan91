@@ -38,7 +38,3 @@ flowchart LR
 - **US** — [portfolio-research](https://github.com/younghwan91/portfolio-research) · [macro-sector-agent](https://github.com/younghwan91/macro-sector-agent)
 - **Crypto** — [binance-quant-engine](https://github.com/younghwan91/binance-quant-engine) · [crypto-quant-insights](https://github.com/younghwan91/crypto-quant-insights)
 - **Tools** — [fin-checkup](https://github.com/younghwan91/fin-checkup) · [automated-stock-trading-systems](https://github.com/younghwan91/automated-stock-trading-systems)
-
-## License
-
-CC BY-NC-ND 4.0 — see [LICENSE](LICENSE).
