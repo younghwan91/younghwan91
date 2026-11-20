@@ -77,8 +77,13 @@ def parse_stack(path: Path) -> tuple[dict, list[dict]]:
                 continue
             m = re.match(r'^\s{4}(\w+):\s*"?(.*?)"?\s*$', line)
             if m and current is not None:
-                current[m.group(1)] = m.group(2)
+                current[m.group(1)] = m.group(2).replace('\\"', '"')  # YAML 이스케이프 \" → "
 
+    # 파서가 모르는 이스케이프가 푸터에 그대로 찍히지 않게 막는다(\" 가 14개 README 에 새던 일).
+    for r in repos:
+        for k, v in r.items():
+            if "\\" in v:
+                raise SystemExit(f"stack.yml {r['name']}.{k}: 처리하지 못한 백슬래시 — {v!r}")
     return axes, repos
 
 

@@ -49,6 +49,21 @@ repos:
     ko: "코스피·코스닥 알파 심사 프레임워크 — 개별 트레이드 분포로 판정하고 랜덤 음성대조·purged CV·Deflated Sharpe 를 CI 가드레일로 강제"
     en: "KOSPI/KOSDAQ alpha validation framework — judged on the per-trade distribution, with random null controls, purged CV and Deflated Sharpe enforced as CI guardrails"
 
+  - name: sector-flow
+    axis: kr
+    ko: "코스피·코스닥 섹터별 수급 일일 리포트 — 어느 섹터에 누구의 돈이 들어왔는지 터미널과 웹에서 본다"
+    en: "Daily KOSPI/KOSDAQ sector money-flow report — whose money went into which sector, in the terminal and on the web"
+
+  - name: daytrade-it
+    axis: kr
+    ko: "한국 주식 데이트레이딩 연구 시스템 — DART 공시 리스크 게이트, 키움 브로커 어댑터, MCP 도구 인터페이스"
+    en: "Korean-equity day-trading research system — DART disclosure risk gate, Kiwoom broker adapter, MCP tool interface"
+
+  - name: scalp-it
+    axis: kr
+    ko: "국내 단타 전략 검증 프레임워크 + 장중 틱·호가 실시간 수집 — 사전등록하고 한 번만 잰다"
+    en: "Korean intraday strategy validation framework + live tick/orderbook collection — pre-registered, measured once"
+
   - name: portfolio-research
     axis: us
     ko: "미국주식 팩터 엔진 — point-in-time·생존편향 보정 데이터 위에서 walk-forward 를 Deflated Sharpe·PBO 로 게이팅하고 ETF 전술배분도 같은 관문을 지난다"
