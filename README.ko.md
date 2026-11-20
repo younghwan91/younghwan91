@@ -13,6 +13,7 @@
 </p>
 
 ```mermaid
+%%{init: {"flowchart": {"useMaxWidth": false, "nodeSpacing": 8, "rankSpacing": 16, "padding": 4}, "themeVariables": {"fontSize": "10px"}}}%%
 flowchart LR
     K1["🇰🇷 키움 · 뉴스 · 재무 클라이언트"] --> K2[("quant-airflow<br/>TimescaleDB")] --> K3["swing-it · sector-flow<br/>daytrade-it · scalp-it"]
     KC["krx-quant-core"] --> K3
