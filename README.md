@@ -108,3 +108,7 @@ Strategies and parameters stay closed. Only structure and discipline are written
   <img src="https://img.shields.io/badge/Airflow-017CEE?style=flat-square&logo=apacheairflow&logoColor=white" alt="Airflow"/>
   <img src="https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white" alt="Docker"/>
 </p>
+
+## License
+
+CC BY-NC-ND 4.0 — see [LICENSE](LICENSE).
