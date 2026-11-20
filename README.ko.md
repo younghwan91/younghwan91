@@ -108,3 +108,7 @@ flowchart TB
   <img src="https://img.shields.io/badge/Airflow-017CEE?style=flat-square&logo=apacheairflow&logoColor=white" alt="Airflow"/>
   <img src="https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white" alt="Docker"/>
 </p>
+
+## 라이선스
+
+CC BY-NC-ND 4.0 — [LICENSE](LICENSE) 참고.
