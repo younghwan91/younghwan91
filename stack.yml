@@ -79,10 +79,10 @@ repos:
     ko: "Bensdorp 의 7개 비상관 트레이딩 시스템 백테스터 (교육용 재구현)"
     en: "Backtester for Bensdorp's seven non-correlated trading systems (educational reimplementation)"
 
-  - name: binance-quant-engine
+  - name: quantbox
     axis: cx
-    ko: "암호화폐 선물 백테스트·실행 엔진 — 룩어헤드 0, 백테스트↔실거래 일체화"
-    en: "Crypto futures backtest & execution engine — zero lookahead, backtest↔live parity"
+    ko: "바이낸스 USDT-M 선물 변동성 압축(VR) 스퀴즈 시스템 — 백테스트↔실거래 일체화, 키는 환경변수로만"
+    en: "Binance USDT-M futures volatility-compression (VR) squeeze system — backtest↔live parity, secrets via env only"
 
   - name: crypto-quant-insights
     axis: cx
