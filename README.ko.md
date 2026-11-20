@@ -38,7 +38,3 @@ flowchart LR
 - **미국** — [portfolio-research](https://github.com/younghwan91/portfolio-research) · [macro-sector-agent](https://github.com/younghwan91/macro-sector-agent)
 - **크립토** — [binance-quant-engine](https://github.com/younghwan91/binance-quant-engine) · [crypto-quant-insights](https://github.com/younghwan91/crypto-quant-insights)
 - **도구** — [fin-checkup](https://github.com/younghwan91/fin-checkup) · [automated-stock-trading-systems](https://github.com/younghwan91/automated-stock-trading-systems)
-
-## 라이선스
-
-CC BY-NC-ND 4.0 — [LICENSE](LICENSE) 참고.
