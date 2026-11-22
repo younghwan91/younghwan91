@@ -56,7 +56,6 @@ flowchart LR
 | [**quant-airflow**](https://github.com/younghwan91/quant-airflow) | Data Pipeline | Airflow + TimescaleDB orchestration for Korean equity market & fundamental data |
 | [**swing-it**](https://github.com/younghwan91/swing-it) | Alpha Validation | KOSPI/KOSDAQ alpha validation with random null controls, purged CV & Deflated Sharpe |
 | [**portfolio-research**](https://github.com/younghwan91/portfolio-research) | US Equities | US equity factor engine & tactical asset allocation gated by walk-forward validation |
-| [**binance-quant-engine**](https://github.com/younghwan91/binance-quant-engine) | Crypto Futures | Strategy-agnostic Binance USDT-M futures backtest & execution engine |
 
 <details>
 <summary>Full ecosystem (clients, research &amp; tooling)</summary>

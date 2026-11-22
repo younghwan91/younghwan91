@@ -56,7 +56,6 @@ flowchart LR
 | [**quant-airflow**](https://github.com/younghwan91/quant-airflow) | 데이터 파이프라인 | Airflow + TimescaleDB 기반 한국 주식 시세 · 재무 데이터 적재 |
 | [**swing-it**](https://github.com/younghwan91/swing-it) | 알파 검증 | 랜덤 널 대조군 · Purged CV · Deflated Sharpe 기반 KOSPI/KOSDAQ 알파 검증 |
 | [**portfolio-research**](https://github.com/younghwan91/portfolio-research) | 미국 주식 | 워크포워드 검증(Deflated Sharpe, PBO) 기반 미국 주식 팩터 · 자산배분 엔진 |
-| [**binance-quant-engine**](https://github.com/younghwan91/binance-quant-engine) | 크립토 선물 | 전략 비의존 Binance USDT-M 선물 백테스트 및 실행 엔진 |
 
 <details>
 <summary>전체 생태계 (클라이언트 · 리서치 · 도구)</summary>
