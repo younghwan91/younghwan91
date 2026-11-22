@@ -1,9 +1,7 @@
-<p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="docs/images/brand/wordmark-dark.svg">
-    <img alt="Younghwan Chae, Ph.D." src="docs/images/brand/wordmark-light.svg" height="56">
-  </picture>
-</p>
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/images/brand/banner-dark.svg">
+  <img alt="Younghwan Chae, Ph.D." src="docs/images/brand/banner-light.svg" width="100%">
+</picture>
 
 <p align="center">
   <b>한국 주식 오픈소스 퀀트 인프라와 수치 최적화 시스템을 만듭니다.</b><br/>
