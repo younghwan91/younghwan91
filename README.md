@@ -1,6 +1,6 @@
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/images/brand/banner-dark.svg">
-  <img alt="Younghwan Chae, Ph.D." src="docs/images/brand/banner-light.svg" width="100%">
+  <source media="(prefers-color-scheme: dark)" srcset="docs/images/brand/wordmark-dark.svg">
+  <img alt="younghwan91" src="docs/images/brand/wordmark-light.svg" height="52">
 </picture>
 
 <p align="center">
