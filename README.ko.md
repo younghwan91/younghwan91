@@ -1,25 +1,21 @@
+<div align="center">
+
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/images/brand/wordmark-dark.svg">
   <img alt="younghwan91" src="docs/images/brand/wordmark-light.svg" height="52">
 </picture>
 
-<p align="center">
-  <b>한국 주식 오픈소스 퀀트 인프라와 수치 최적화 시스템을 만듭니다.</b><br/>
-  기계공학 박사(<i>수치 최적화</i>) · 낮에는 <b>두산로보틱스</b> ML · 인지 엔지니어로 일합니다.
-</p>
+# younghwan91
 
-<p align="center">
-  <b>한국어</b> · <a href="README.md">English</a>
-  &nbsp;&nbsp;|&nbsp;&nbsp;
-  <a href="https://younghwan91.github.io/">Homepage</a> ·
-  <a href="https://www.linkedin.com/in/younghwan-chae/">LinkedIn</a> ·
-  <a href="mailto:chyohw97@gmail.com">Email</a> ·
-  <a href="https://github.com/younghwan91/resume/releases/latest/download/resume_ko.pdf">이력서 (PDF)</a>
-</p>
+**한국 주식 오픈소스 퀀트 인프라와 수치 최적화 시스템을 만듭니다.**
 
----
+기계공학 박사(*수치 최적화*) · 낮에는 **두산로보틱스** ML · 인지 엔지니어로 일합니다.
 
-### 아키텍처 개요
+**한국어** · [English](README.md) | [Homepage](https://younghwan91.github.io/) · [LinkedIn](https://www.linkedin.com/in/younghwan-chae/) · [Email](mailto:chyohw97@gmail.com) · [이력서 (PDF)](https://github.com/younghwan91/resume/releases/latest/download/resume_ko.pdf)
+
+</div>
+
+## 아키텍처 개요
 
 ```mermaid
 %%{init: {"flowchart": {"useMaxWidth": false, "nodeSpacing": 8, "rankSpacing": 16, "padding": 4}, "themeVariables": {"fontSize": "10px"}}}%%
@@ -43,7 +39,7 @@ flowchart LR
     class C2 eng
 ```
 
-### 주요 오픈소스 프로젝트
+## 주요 오픈소스 프로젝트
 
 | 저장소 | 분야 | 설명 |
 |--------|------|------|
@@ -64,14 +60,12 @@ flowchart LR
 
 </details>
 
-### 기술 스택
+## 기술 스택
 
 - **언어:** Python, C/C++, SQL, LaTeX
 - **ML · 최적화:** PyTorch, 수치 최적화, 센서 퓨전, 4D 레이더 · 컴퓨터 비전
 - **데이터 · 인프라:** PostgreSQL / TimescaleDB, DuckDB, Apache Airflow, Docker, Linux
 
----
+## 라이선스
 
-<p align="center">
-  <sub><a href="LICENSE">CC BY-NC-ND 4.0</a> 라이선스 · 개인 오픈소스 퀀트 프로젝트는 본업과 무관합니다.</sub>
-</p>
+[CC BY-NC-ND 4.0](LICENSE) 라이선스를 따르며, 개인 오픈소스 퀀트 프로젝트는 본업과 무관합니다.

@@ -1,25 +1,21 @@
+<div align="center">
+
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/images/brand/wordmark-dark.svg">
   <img alt="younghwan91" src="docs/images/brand/wordmark-light.svg" height="52">
 </picture>
 
-<p align="center">
-  <b>Open-source quant infrastructure &amp; numerical optimization systems.</b><br/>
-  Ph.D. in Mechanical Engineering (<i>mathematical optimization</i>) · ML &amp; perception engineer <b>@ Doosan Robotics</b> by day.
-</p>
+# younghwan91
 
-<p align="center">
-  <a href="README.ko.md">한국어</a> · <b>English</b>
-  &nbsp;&nbsp;|&nbsp;&nbsp;
-  <a href="https://younghwan91.github.io/">Homepage</a> ·
-  <a href="https://www.linkedin.com/in/younghwan-chae/">LinkedIn</a> ·
-  <a href="mailto:chyohw97@gmail.com">Email</a> ·
-  <a href="https://github.com/younghwan91/resume/releases/latest/download/resume_en.pdf">Résumé (PDF)</a>
-</p>
+**Open-source quant infrastructure &amp; numerical optimization systems.**
 
----
+Ph.D. in Mechanical Engineering (*mathematical optimization*) · ML &amp; perception engineer **@ Doosan Robotics** by day.
 
-### Architecture Overview
+[한국어](README.ko.md) · **English** | [Homepage](https://younghwan91.github.io/) · [LinkedIn](https://www.linkedin.com/in/younghwan-chae/) · [Email](mailto:chyohw97@gmail.com) · [Résumé (PDF)](https://github.com/younghwan91/resume/releases/latest/download/resume_en.pdf)
+
+</div>
+
+## Architecture Overview
 
 ```mermaid
 %%{init: {"flowchart": {"useMaxWidth": false, "nodeSpacing": 8, "rankSpacing": 16, "padding": 4}, "themeVariables": {"fontSize": "10px"}}}%%
@@ -43,17 +39,17 @@ flowchart LR
     class C2 eng
 ```
 
-### Featured Open Source Work
+## Featured Open Source Work
 
 | Repository | Domain | Description |
 |------------|--------|-------------|
-| [**fin-checkup**](https://github.com/younghwan91/fin-checkup) | Personal Finance | Financial checkup & portfolio diagnostics CLI/toolkit |
-| [**kiwoom-client**](https://github.com/younghwan91/kiwoom-client) | Korean Equities | Python client for Kiwoom Securities REST/WebSocket market & order APIs |
-| [**sector-flow**](https://github.com/younghwan91/sector-flow) | Korean Equities | Sector rotation & institutional flow analysis across KRX markets |
+| [**fin-checkup**](https://github.com/younghwan91/fin-checkup) | Personal Finance | Financial checkup &amp; portfolio diagnostics CLI/toolkit |
+| [**kiwoom-client**](https://github.com/younghwan91/kiwoom-client) | Korean Equities | Python client for Kiwoom Securities REST/WebSocket market &amp; order APIs |
+| [**sector-flow**](https://github.com/younghwan91/sector-flow) | Korean Equities | Sector rotation &amp; institutional flow analysis across KRX markets |
 | [**krx-quant-core**](https://github.com/younghwan91/krx-quant-core) | Korean Equities | Shared quantitative core library for KRX data, signals, and backtesting |
-| [**quant-airflow**](https://github.com/younghwan91/quant-airflow) | Data Pipeline | Airflow + TimescaleDB orchestration for Korean equity market & fundamental data |
-| [**swing-it**](https://github.com/younghwan91/swing-it) | Alpha Validation | KOSPI/KOSDAQ alpha validation with random null controls, purged CV & Deflated Sharpe |
-| [**portfolio-research**](https://github.com/younghwan91/portfolio-research) | US Equities | US equity factor engine & tactical asset allocation gated by walk-forward validation |
+| [**quant-airflow**](https://github.com/younghwan91/quant-airflow) | Data Pipeline | Airflow + TimescaleDB orchestration for Korean equity market &amp; fundamental data |
+| [**swing-it**](https://github.com/younghwan91/swing-it) | Alpha Validation | KOSPI/KOSDAQ alpha validation with random null controls, purged CV &amp; Deflated Sharpe |
+| [**portfolio-research**](https://github.com/younghwan91/portfolio-research) | US Equities | US equity factor engine &amp; tactical asset allocation gated by walk-forward validation |
 
 <details>
 <summary>Full ecosystem (clients, research &amp; tooling)</summary>
@@ -64,14 +60,12 @@ flowchart LR
 
 </details>
 
-### Tech Stack
+## Tech Stack
 
 - **Languages:** Python, C/C++, SQL, LaTeX
 - **ML &amp; Optimization:** PyTorch, numerical optimization, sensor fusion, 4D radar &amp; computer vision
 - **Data &amp; Infra:** PostgreSQL / TimescaleDB, DuckDB, Apache Airflow, Docker, Linux
 
----
+## License
 
-<p align="center">
-  <sub>Licensed under <a href="LICENSE">CC BY-NC-ND 4.0</a> · Independent open-source quant work is unrelated to my day job.</sub>
-</p>
+[CC BY-NC-ND 4.0](LICENSE) · Independent open-source quant work is unrelated to my day job.
