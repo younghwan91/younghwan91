@@ -15,6 +15,28 @@ Ph.D. in Mechanical Engineering (*mathematical optimization*) · ML &amp; percep
 
 </div>
 
+## Start Here
+
+- [**kiwoom-client**](https://github.com/younghwan91/kiwoom-client) — Kiwoom Securities REST API for Python and AI agents (MCP), no Windows OCX, runs on macOS and Linux. `pip install kiwoom-client`
+- [**fin-checkup**](https://github.com/younghwan91/fin-checkup) — Traffic-light check-up of a Korean listed company's financial statements: 17 metrics, each with its formula and thresholds. [Try it in the browser](https://younghwan91.github.io/fin-checkup/)
+- [**kiwoom-order-guard**](https://github.com/younghwan91/kiwoom-order-guard) — Claude Code hook that checks what an AI agent's Kiwoom order actually says (amount, quantity, market buys, repeats) before it is sent.
+
+## Korean Market Libraries
+
+| Repository | Description |
+|------------|-------------|
+| [**sector-flow**](https://github.com/younghwan91/sector-flow) | One map of which investor groups sold and bought which sectors today |
+| [**krx-news-client**](https://github.com/younghwan91/krx-news-client) | DART filings and Toss Securities news in one schema |
+| [**krx-fundamentals-client**](https://github.com/younghwan91/krx-fundamentals-client) | Company fundamentals from DART, KRX and Naver as Pydantic models |
+| [**krx-quant-core**](https://github.com/younghwan91/krx-quant-core) | Shared core for KRX market rules, costs, order guards and validation statistics |
+
+## Everything Else
+
+- **Data pipeline:** [quant-airflow](https://github.com/younghwan91/quant-airflow) — Airflow + TimescaleDB for Korean equity prices and fundamentals, delisted names included
+- **Research (Korea):** [swing-it](https://github.com/younghwan91/swing-it) · [daytrade-it](https://github.com/younghwan91/daytrade-it) · [scalp-it](https://github.com/younghwan91/scalp-it)
+- **Research (US &amp; crypto):** [portfolio-research](https://github.com/younghwan91/portfolio-research) · [macro-sector-agent](https://github.com/younghwan91/macro-sector-agent) · [quantbox](https://github.com/younghwan91/quantbox) · [crypto-quant-insights](https://github.com/younghwan91/crypto-quant-insights)
+- **Study &amp; tools:** [automated-stock-trading-systems](https://github.com/younghwan91/automated-stock-trading-systems) · [resume](https://github.com/younghwan91/resume)
+
 ## Architecture Overview
 
 <p align="center">
@@ -24,26 +46,6 @@ Ph.D. in Mechanical Engineering (*mathematical optimization*) · ML &amp; percep
   </picture>
 </p>
 
-## Featured Open Source Work
-
-| Repository | Domain | Description |
-|------------|--------|-------------|
-| [**fin-checkup**](https://github.com/younghwan91/fin-checkup) | Personal Finance | Financial checkup &amp; portfolio diagnostics CLI/toolkit |
-| [**kiwoom-client**](https://github.com/younghwan91/kiwoom-client) | Korean Equities | Python client for Kiwoom Securities REST/WebSocket market &amp; order APIs |
-| [**sector-flow**](https://github.com/younghwan91/sector-flow) | Korean Equities | Sector rotation &amp; institutional flow analysis across KRX markets |
-| [**krx-quant-core**](https://github.com/younghwan91/krx-quant-core) | Korean Equities | Shared quantitative core library for KRX data, signals, and backtesting |
-| [**quant-airflow**](https://github.com/younghwan91/quant-airflow) | Data Pipeline | Airflow + TimescaleDB orchestration for Korean equity market &amp; fundamental data |
-| [**swing-it**](https://github.com/younghwan91/swing-it) | Alpha Validation | KOSPI/KOSDAQ alpha validation with random null controls, purged CV &amp; Deflated Sharpe |
-| [**portfolio-research**](https://github.com/younghwan91/portfolio-research) | US Equities | US equity factor engine &amp; tactical asset allocation gated by walk-forward validation |
-
-<details>
-<summary>Full ecosystem (clients, research &amp; tooling)</summary>
-
-- **Korea:** [krx-news-client](https://github.com/younghwan91/krx-news-client) · [krx-fundamentals-client](https://github.com/younghwan91/krx-fundamentals-client) · [daytrade-it](https://github.com/younghwan91/daytrade-it) · [scalp-it](https://github.com/younghwan91/scalp-it) · [kiwoom-order-guard](https://github.com/younghwan91/kiwoom-order-guard)
-- **US &amp; Crypto:** [macro-sector-agent](https://github.com/younghwan91/macro-sector-agent) · [quantbox](https://github.com/younghwan91/quantbox) · [crypto-quant-insights](https://github.com/younghwan91/crypto-quant-insights)
-- **Research &amp; Tools:** [automated-stock-trading-systems](https://github.com/younghwan91/automated-stock-trading-systems) · [resume](https://github.com/younghwan91/resume)
-
-</details>
 
 ## Tech Stack
 
