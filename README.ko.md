@@ -15,6 +15,28 @@
 
 </div>
 
+## 여기서 시작하세요
+
+- [**kiwoom-client**](https://github.com/younghwan91/kiwoom-client) — 키움 REST API 를 파이썬과 AI 에이전트(MCP)로 씁니다. 윈도 OCX 없이 맥·리눅스에서도 돕니다. `pip install kiwoom-client`
+- [**fin-checkup**](https://github.com/younghwan91/fin-checkup) — 상장사 재무제표를 신호등으로 읽어 줍니다. 지표 17개마다 계산식과 기준값이 붙습니다. [브라우저에서 바로 보기](https://younghwan91.github.io/fin-checkup/)
+- [**kiwoom-order-guard**](https://github.com/younghwan91/kiwoom-order-guard) — AI 에이전트가 내는 키움 주문의 내용(금액·수량·시장가 매수·반복 전송)을 보내기 전에 검사하는 Claude Code 훅입니다.
+
+## 한국 주식 라이브러리
+
+| 저장소 | 설명 |
+|--------|------|
+| [**sector-flow**](https://github.com/younghwan91/sector-flow) | 오늘 어느 투자 주체가 어느 섹터를 넘기고 넘겨받았는지 한 장의 지도로 봅니다 |
+| [**krx-news-client**](https://github.com/younghwan91/krx-news-client) | DART 공시와 토스증권 뉴스를 한 스키마로 받습니다 |
+| [**krx-fundamentals-client**](https://github.com/younghwan91/krx-fundamentals-client) | DART·KRX·네이버의 기업 펀더멘털을 Pydantic 모델로 돌려줍니다 |
+| [**krx-quant-core**](https://github.com/younghwan91/krx-quant-core) | 시장 규칙·비용·주문 가드·검증 통계를 한 군데서 맞추는 공통 코어입니다 |
+
+## 그 밖의 저장소
+
+- **데이터 파이프라인:** [quant-airflow](https://github.com/younghwan91/quant-airflow) — 상장폐지 종목까지 담는 Airflow + TimescaleDB 한국 주식 시세·재무 적재
+- **리서치 (한국):** [swing-it](https://github.com/younghwan91/swing-it) · [daytrade-it](https://github.com/younghwan91/daytrade-it) · [scalp-it](https://github.com/younghwan91/scalp-it)
+- **리서치 (미국 · 크립토):** [portfolio-research](https://github.com/younghwan91/portfolio-research) · [macro-sector-agent](https://github.com/younghwan91/macro-sector-agent) · [quantbox](https://github.com/younghwan91/quantbox) · [crypto-quant-insights](https://github.com/younghwan91/crypto-quant-insights)
+- **공부 · 도구:** [automated-stock-trading-systems](https://github.com/younghwan91/automated-stock-trading-systems) · [resume](https://github.com/younghwan91/resume)
+
 ## 아키텍처 개요
 
 <p align="center">
@@ -24,26 +46,6 @@
   </picture>
 </p>
 
-## 주요 오픈소스 프로젝트
-
-| 저장소 | 분야 | 설명 |
-|--------|------|------|
-| [**fin-checkup**](https://github.com/younghwan91/fin-checkup) | 개인 재무 | 재무 건전성 점검 및 포트폴리오 진단 CLI/도구 |
-| [**kiwoom-client**](https://github.com/younghwan91/kiwoom-client) | 한국 주식 | 키움증권 REST/WebSocket 시세 · 주문 API 파이썬 클라이언트 |
-| [**sector-flow**](https://github.com/younghwan91/sector-flow) | 한국 주식 | KRX 섹터 순환 및 기관 · 외국인 수급 흐름 분석 |
-| [**krx-quant-core**](https://github.com/younghwan91/krx-quant-core) | 한국 주식 | KRX 데이터 · 시그널 · 백테스트 공통 퀀트 코어 라이브러리 |
-| [**quant-airflow**](https://github.com/younghwan91/quant-airflow) | 데이터 파이프라인 | Airflow + TimescaleDB 기반 한국 주식 시세 · 재무 데이터 적재 |
-| [**swing-it**](https://github.com/younghwan91/swing-it) | 알파 검증 | 랜덤 널 대조군 · Purged CV · Deflated Sharpe 기반 KOSPI/KOSDAQ 알파 검증 |
-| [**portfolio-research**](https://github.com/younghwan91/portfolio-research) | 미국 주식 | 워크포워드 검증(Deflated Sharpe, PBO) 기반 미국 주식 팩터 · 자산배분 엔진 |
-
-<details>
-<summary>전체 생태계 (클라이언트 · 리서치 · 도구)</summary>
-
-- **한국:** [krx-news-client](https://github.com/younghwan91/krx-news-client) · [krx-fundamentals-client](https://github.com/younghwan91/krx-fundamentals-client) · [daytrade-it](https://github.com/younghwan91/daytrade-it) · [scalp-it](https://github.com/younghwan91/scalp-it) · [kiwoom-order-guard](https://github.com/younghwan91/kiwoom-order-guard)
-- **미국 · 크립토:** [macro-sector-agent](https://github.com/younghwan91/macro-sector-agent) · [quantbox](https://github.com/younghwan91/quantbox) · [crypto-quant-insights](https://github.com/younghwan91/crypto-quant-insights)
-- **리서치 · 도구:** [automated-stock-trading-systems](https://github.com/younghwan91/automated-stock-trading-systems) · [resume](https://github.com/younghwan91/resume)
-
-</details>
 
 ## 기술 스택
 
