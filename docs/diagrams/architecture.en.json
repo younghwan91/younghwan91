@@ -1,0 +1,160 @@
+{
+  "schema_version": 1,
+  "diagram_type": "dataflow",
+  "meta": {
+    "title": "Architecture Overview",
+    "locale": "en",
+    "output": "docs/diagrams/architecture.en.html",
+    "quality_profile": "showcase"
+  },
+  "stages": [
+    {
+      "label": "Data sources"
+    },
+    {
+      "label": "Ingest · store"
+    },
+    {
+      "label": "Research · strategy"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "kr-clients",
+      "type": "external",
+      "label": "KRX clients",
+      "sublabel": "kiwoom · news · fundamentals",
+      "stage": 0,
+      "row": 0,
+      "tag": "Korea"
+    },
+    {
+      "id": "kr-pipeline",
+      "type": "database",
+      "label": "quant-airflow",
+      "sublabel": "TimescaleDB",
+      "stage": 1,
+      "row": 0
+    },
+    {
+      "id": "kr-core",
+      "type": "backend",
+      "label": "krx-quant-core",
+      "sublabel": "shared core library",
+      "stage": 1,
+      "row": 1
+    },
+    {
+      "id": "kr-strategies",
+      "type": "backend",
+      "label": "swing-it · sector-flow",
+      "sublabel": "daytrade-it · scalp-it",
+      "stage": 2,
+      "row": 0,
+      "width": 150
+    },
+    {
+      "id": "us-source",
+      "type": "external",
+      "label": "Sharadar",
+      "sublabel": "US equity data",
+      "stage": 0,
+      "row": 2,
+      "tag": "US"
+    },
+    {
+      "id": "us-store",
+      "type": "database",
+      "label": "DuckDB",
+      "sublabel": "local store",
+      "stage": 1,
+      "row": 2
+    },
+    {
+      "id": "us-research",
+      "type": "backend",
+      "label": "portfolio-research",
+      "sublabel": "macro-sector-agent",
+      "stage": 2,
+      "row": 2,
+      "width": 150
+    },
+    {
+      "id": "cx-source",
+      "type": "external",
+      "label": "Exchange APIs",
+      "sublabel": "Binance USDT-M",
+      "stage": 0,
+      "row": 3,
+      "tag": "Crypto"
+    },
+    {
+      "id": "cx-engine",
+      "type": "backend",
+      "label": "quantbox",
+      "sublabel": "trading system",
+      "stage": 1,
+      "row": 3
+    },
+    {
+      "id": "cx-insights",
+      "type": "backend",
+      "label": "crypto-quant-insights",
+      "sublabel": "validation lessons",
+      "stage": 2,
+      "row": 3,
+      "width": 150
+    }
+  ],
+  "flows": [
+    {
+      "id": "kr-ingest",
+      "from": "kr-clients",
+      "to": "kr-pipeline",
+      "label": "market data",
+      "variant": "emphasis"
+    },
+    {
+      "id": "kr-read",
+      "from": "kr-pipeline",
+      "to": "kr-strategies",
+      "label": "time series",
+      "variant": "emphasis"
+    },
+    {
+      "id": "kr-core-use",
+      "from": "kr-core",
+      "to": "kr-strategies",
+      "label": "rules · costs",
+      "fromSide": "right",
+      "toSide": "bottom"
+    },
+    {
+      "id": "us-ingest",
+      "from": "us-source",
+      "to": "us-store",
+      "label": "market data",
+      "variant": "emphasis"
+    },
+    {
+      "id": "us-read",
+      "from": "us-store",
+      "to": "us-research",
+      "label": "research data",
+      "variant": "emphasis"
+    },
+    {
+      "id": "cx-ingest",
+      "from": "cx-source",
+      "to": "cx-engine",
+      "label": "futures data",
+      "variant": "emphasis"
+    },
+    {
+      "id": "cx-validate",
+      "from": "cx-engine",
+      "to": "cx-insights",
+      "label": "validation runs"
+    }
+  ]
+}
