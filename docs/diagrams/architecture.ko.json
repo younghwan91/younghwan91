@@ -1,0 +1,160 @@
+{
+  "schema_version": 1,
+  "diagram_type": "dataflow",
+  "meta": {
+    "title": "아키텍처 개요",
+    "locale": "ko",
+    "output": "docs/diagrams/architecture.ko.html",
+    "quality_profile": "showcase"
+  },
+  "stages": [
+    {
+      "label": "데이터 소스"
+    },
+    {
+      "label": "적재 · 저장"
+    },
+    {
+      "label": "리서치 · 전략"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "kr-clients",
+      "type": "external",
+      "label": "KRX 클라이언트",
+      "sublabel": "키움 · 뉴스 · 재무",
+      "stage": 0,
+      "row": 0,
+      "tag": "한국"
+    },
+    {
+      "id": "kr-pipeline",
+      "type": "database",
+      "label": "quant-airflow",
+      "sublabel": "TimescaleDB",
+      "stage": 1,
+      "row": 0
+    },
+    {
+      "id": "kr-core",
+      "type": "backend",
+      "label": "krx-quant-core",
+      "sublabel": "공통 코어 라이브러리",
+      "stage": 1,
+      "row": 1
+    },
+    {
+      "id": "kr-strategies",
+      "type": "backend",
+      "label": "swing-it · sector-flow",
+      "sublabel": "daytrade-it · scalp-it",
+      "stage": 2,
+      "row": 0,
+      "width": 150
+    },
+    {
+      "id": "us-source",
+      "type": "external",
+      "label": "Sharadar",
+      "sublabel": "미국 주식 데이터",
+      "stage": 0,
+      "row": 2,
+      "tag": "미국"
+    },
+    {
+      "id": "us-store",
+      "type": "database",
+      "label": "DuckDB",
+      "sublabel": "로컬 저장소",
+      "stage": 1,
+      "row": 2
+    },
+    {
+      "id": "us-research",
+      "type": "backend",
+      "label": "portfolio-research",
+      "sublabel": "macro-sector-agent",
+      "stage": 2,
+      "row": 2,
+      "width": 150
+    },
+    {
+      "id": "cx-source",
+      "type": "external",
+      "label": "거래소 API",
+      "sublabel": "Binance USDT-M",
+      "stage": 0,
+      "row": 3,
+      "tag": "크립토"
+    },
+    {
+      "id": "cx-engine",
+      "type": "backend",
+      "label": "quantbox",
+      "sublabel": "트레이딩 시스템",
+      "stage": 1,
+      "row": 3
+    },
+    {
+      "id": "cx-insights",
+      "type": "backend",
+      "label": "crypto-quant-insights",
+      "sublabel": "검증 기록",
+      "stage": 2,
+      "row": 3,
+      "width": 150
+    }
+  ],
+  "flows": [
+    {
+      "id": "kr-ingest",
+      "from": "kr-clients",
+      "to": "kr-pipeline",
+      "label": "시세 데이터",
+      "variant": "emphasis"
+    },
+    {
+      "id": "kr-read",
+      "from": "kr-pipeline",
+      "to": "kr-strategies",
+      "label": "시계열",
+      "variant": "emphasis"
+    },
+    {
+      "id": "kr-core-use",
+      "from": "kr-core",
+      "to": "kr-strategies",
+      "label": "규칙 · 비용",
+      "fromSide": "right",
+      "toSide": "bottom"
+    },
+    {
+      "id": "us-ingest",
+      "from": "us-source",
+      "to": "us-store",
+      "label": "시세 데이터",
+      "variant": "emphasis"
+    },
+    {
+      "id": "us-read",
+      "from": "us-store",
+      "to": "us-research",
+      "label": "리서치 데이터",
+      "variant": "emphasis"
+    },
+    {
+      "id": "cx-ingest",
+      "from": "cx-source",
+      "to": "cx-engine",
+      "label": "선물 데이터",
+      "variant": "emphasis"
+    },
+    {
+      "id": "cx-validate",
+      "from": "cx-engine",
+      "to": "cx-insights",
+      "label": "검증 실행"
+    }
+  ]
+}

@@ -17,27 +17,12 @@ Ph.D. in Mechanical Engineering (*mathematical optimization*) · ML &amp; percep
 
 ## Architecture Overview
 
-```mermaid
-%%{init: {"flowchart": {"useMaxWidth": false, "nodeSpacing": 8, "rankSpacing": 16, "padding": 4}, "themeVariables": {"fontSize": "10px"}}}%%
-flowchart LR
-    K1["🇰🇷 kiwoom · news · fundamentals clients"] --> K2[("quant-airflow<br/>TimescaleDB")] --> K3["swing-it · sector-flow<br/>daytrade-it · scalp-it"]
-    KC["krx-quant-core"] --> K3
-    U1["🇺🇸 Sharadar"] --> U2[("DuckDB")] --> U3["portfolio-research<br/>macro-sector-agent"]
-    C1["🪙 Exchange APIs"] --> C2["quantbox"] --> C3["crypto-quant-insights"]
-
-    classDef src  fill:#2563EB,stroke:#1E40AF,color:#FFFFFF
-    classDef pipe fill:#7C3AED,stroke:#5B21B6,color:#FFFFFF
-    classDef db   fill:#D97706,stroke:#92400E,color:#FFFFFF
-    classDef core fill:#0D9488,stroke:#115E59,color:#FFFFFF
-    classDef res  fill:#059669,stroke:#065F46,color:#FFFFFF
-    classDef eng  fill:#EA580C,stroke:#9A3412,color:#FFFFFF
-    class K1,U1,C1 src
-    class K2 pipe
-    class U2 db
-    class KC core
-    class K3,U3,C3 res
-    class C2 eng
-```
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/images/architecture-en-dark.svg">
+    <img alt="Architecture overview: KRX, US and crypto data sources flow through ingest and storage into research and strategy repositories" src="docs/images/architecture-en-light.svg" width="638">
+  </picture>
+</p>
 
 ## Featured Open Source Work
 

@@ -20,6 +20,16 @@ README 는 다른 레포들의 요약이다. 갱신할 때는 각 레포 상태�
 - 코드에 아직 없는 계획·예정 연결은 그리지 않는다. 각 레포 자기 README 가 하는 말과 어긋나지 않게.
 - 레포 개명 시 옛 이름은 흔적 없이 지운다("formerly X" 도 남기지 않는다).
 
-## mermaid
-로컬 렌더 검증 수단이 없다(2026-10-12: puppeteer chrome 이 `libatk` 부재로 안 뜸). 문법을 눈으로 확인하고,
-푸시 후 github.com/younghwan91 에서 다이어그램이 뜨는지 사용자에게 확인을 부탁한다고 보고에 적는다.
+## 다이어그램 (archify — mermaid 쓰지 않는다)
+README 플로우차트는 archify 로 만든 SVG 이미지다. 원본은 `docs/diagrams/architecture.{en,ko}.json`,
+결과물은 `docs/images/architecture-{en,ko}-{light,dark}.svg`. 고칠 때는 JSON 두 판을 같이 고치고 다시 뽑는다.
+```bash
+export ARCHIFY_CHROME=~/.cache/ms-playwright/chromium-1255/chrome-linux64/chrome ARCHIFY_CHROME_NO_SANDBOX=1
+A=~/.claude/skills/archify/bin/archify.mjs
+for l in en ko; do
+  node $A finalize dataflow docs/diagrams/architecture.$l.json docs/diagrams/architecture.$l.html --quality showcase --out-dir /tmp/archify-review-$l
+  node scripts/export_diagram_svg.mjs docs/diagrams/architecture.$l.html docs/images/architecture-$l
+done
+```
+- puppeteer chrome 은 `libatk` 부재로 안 뜬다. playwright chromium 을 쓰고, AppArmor 가 샌드박스를 막아 `--no-sandbox` 가 필요하다.
+- 뽑은 SVG 는 chromium `--screenshot` 으로 PNG 를 떠서 눈으로 확인한다.
